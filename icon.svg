@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="이시가키 항해도">
+  <rect width="512" height="512" rx="112" fill="#0F2028"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#CFE6EC" stroke-width="14" opacity=".45"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#D10A6E" stroke-width="14"
+          stroke-dasharray="236 707" stroke-dashoffset="-59" stroke-linecap="round"/>
+  <path d="M256 150 L300 300 L256 272 L212 300 Z" fill="#D10A6E"/>
+  <circle cx="256" cy="256" r="16" fill="#0F2028"/>
+</svg>
