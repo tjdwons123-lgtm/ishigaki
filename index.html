@@ -169,6 +169,10 @@ button{font:inherit;color:inherit}
   border:0;border-radius:10px;padding:14px 16px;cursor:pointer;margin-bottom:14px;
   display:flex;align-items:center;justify-content:space-between;gap:12px}
 .jump:hover{background:var(--shoal)}
+a.jump{text-decoration:none;color:inherit}
+a.jump.review{background:var(--chart-soft);border:1px solid var(--chart)}
+a.jump.review:hover{background:var(--chart);color:#fff}
+a.jump.review:hover small,a.jump.review:hover .arw{color:#fff}
 .jump b{font-size:14.5px;font-weight:600;display:block}
 .jump small{color:var(--ink-2);font-size:12.5px}
 .jump .arw{font-family:"IBM Plex Mono",monospace;color:var(--chart);font-size:16px;flex:0 0 auto}
@@ -347,6 +351,31 @@ tr.gapr td{border:0;font-weight:600;color:var(--chart)}
 .pick{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:9px;
   letter-spacing:.12em;text-transform:uppercase;background:var(--ink);color:var(--deep);
   padding:2px 6px;border-radius:100px;margin-left:6px;vertical-align:2px}
+
+/* ═══ 조 편성 ═══ */
+.tlede{font-size:13px;color:var(--ink-2);margin-bottom:14px;line-height:1.65}
+.tlede b{color:var(--ink);font-weight:600}
+.sub-label{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);margin:22px 0 10px}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.team{background:var(--shoal-soft);border-radius:10px;padding:14px}
+.tname{font-size:16px;font-weight:600;margin-bottom:8px}
+.tname span{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3);font-weight:400;margin-left:4px}
+.team ul{margin:0;padding-left:16px;font-size:13px;line-height:1.8}
+.team ul small{color:var(--ink-3);font-size:11.5px}
+.tcar{margin-top:10px;padding-top:9px;border-top:1px solid var(--shoal);
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3)}
+.roles{display:flex;flex-direction:column}
+.role{padding:11px 0;border-bottom:1px solid var(--rule-soft)}
+.role:last-child{border-bottom:0;padding-bottom:0}
+.rname{font-size:14px;font-weight:600;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.rname span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--chart);font-weight:500}
+.role p{font-size:12.5px;color:var(--ink-2);margin-top:3px;line-height:1.6}
+.brief{list-style:none;padding:0;margin:0;font-size:13.5px}
+.brief li{padding:7px 0;border-bottom:1px solid var(--rule-soft)}
+.brief li:last-child{border-bottom:0}
+.brief li.ok{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--rule)}
+.tinytel{font-family:"IBM Plex Mono",monospace;font-size:12px;margin-left:4px}
 
 /* ═══ 정보 ═══ */
 details{background:var(--card);border-radius:12px;margin-bottom:10px;box-shadow:var(--shadow);
@@ -562,6 +591,32 @@ function fetchWx(force){
   }).catch(function(){});
 }
 
+/* ─── 검수에서 채택한 안 ───
+   review/ 페이지에서 고른 결과를 그대로 읽습니다. 같은 주소(origin) 안에 있어서
+   저장소를 공유합니다. 아무것도 안 골랐으면 기존 일정 그대로입니다. */
+var adopted = load("isg-adopted", {});
+
+/* 채택된 안을 일정에 얹습니다. 원본은 건드리지 않고 그때그때 복사본을 만듭니다. */
+function dayOf(i){
+  var D = DAYS[i];
+  var out = { d:D.d, wd:D.wd, title:D.title, note:D.note,
+              steps:D.steps.slice(), meals:D.meals.slice(), q:STEP_Q[i].slice() };
+
+  if (i === 1 && adopted["manta-swap"]) {
+    out.title = "전원이 함께, 만타를 보러";
+    out.note = "환상의 섬 대신 만타 포인트로 갑니다. 9~11월이 번식기라 조우율이 가장 높은 시기지만, 야생이라 100%는 아닙니다.";
+    out.steps[1] = ["오전","가비라 출항 — 만타 + 산호 스노클링",
+      "5시간 · 가비라 이시자키 만타 스크램블. 포인트까지 배로 편도 45~50분이라 이동이 깁니다. 수심 5~10m로 산호 스노클링보다 깊고, 구명조끼 필수·잠수 금지. 수영을 못해도 참가할 수 있습니다. 못 보면 바다거북 포인트로 대체해줍니다",1];
+    out.q[1] = "川平石崎マンタスクランブル";
+  }
+  if (i === 1 && adopted["monkey"]) {
+    out.steps.splice(4, 0, ["14:00","이시가키 야이마무라 — 리스자루노모리",
+      "시내에서 15분 · 09:00~17:30 · 입촌료 1,080엔~. 다람쥐원숭이가 반방사 상태로 있어 어깨나 손에 올라옵니다. 류큐 전통가옥과 나구라만 전망도 같이. 희망자만 가고 나머지는 숙소에서 쉬면 됩니다",0]);
+    out.q.splice(4, 0, "石垣やいま村");
+  }
+  return out;
+}
+
 /* ─── 지도 ───
    타일 지도를 쓰지 않는 이유: 인터넷이 있어야 뜹니다. 오프라인이 이 앱의
    핵심이라 섬 윤곽을 직접 그립니다. 실제 위경도를 정거원통도법으로 투영해
@@ -577,6 +632,8 @@ var GEO = {
   yonehara:  [24.466, 124.178, "요네하라", "t", "米原ビーチ"],
   sunset:    [24.552, 124.280, "선셋비치", "l", "石垣島サンセットビーチ"],
   ugan:      [24.437, 124.073, "우간자키", "b", "御神崎"],
+  manta:     [24.470, 124.128, "만타 포인트", "l", "川平石崎マンタスクランブル"],
+  yaima:     [24.394, 124.128, "야이마무라", "l", "石垣やいま村"],
   taketomi:  [24.331, 124.093, "다케토미섬", "l", "竹富島"],
   maboroshi: [24.352, 124.057, "환상의 섬", "l", "24.3517,124.0567"]
 };
@@ -619,6 +676,9 @@ var PY = function(lat){ return (24.625 - lat) * 1000; };
 
 function mapHTML(i){
   var legs = ROUTES[i];
+  /* 채택한 안에 따라 그날 경로가 달라집니다 */
+  if (i === 1 && adopted["manta-swap"]) legs = [["shiraho","town","car"],["town","manta","boat"]];
+  if (i === 1 && adopted["monkey"]) legs = legs.concat([["town","yaima","car"],["yaima","town","car"]]);
 
   /* 방문 순서대로 중복 없이 */
   var order = [], seen = {};
@@ -766,8 +826,8 @@ var STEP_Q = [
 var MEAL_Q = [[""],[],[""],["うさぎや 石垣本店"],[]];
 
 /* ─── 조각 렌더러 ─── */
-function stepsHTML(steps, day){
-  var qs = STEP_Q[day] || [];
+function stepsHTML(steps, qs){
+  qs = qs || [];
   return steps.map(function(s, n){
     var q = qs[n], name = esc(s[1]);
     var title = q
@@ -779,8 +839,8 @@ function stepsHTML(steps, day){
       '<span class="mini-b">' + title + (s[2] ? "<small>" + esc(s[2]) + "</small>" : "") + '</span></div>';
   }).join("");
 }
-function mealsHTML(meals, day){
-  var qs = MEAL_Q[day] || [];
+function mealsHTML(meals, qs){
+  qs = qs || [];
   return meals.map(function(m, n){
     var q = qs[n], name = esc(m[1]);
     var title = q
@@ -849,15 +909,24 @@ function renderToday(){
   var pending = TASKS.filter(function(t){ return !(checks[t.id] && checks[t.id].done); });
   var h = installHTML();
 
+  /* 검수 페이지로 가는 길 — 아직 아무것도 안 골랐으면 눈에 띄게 */
+  var picked = Object.keys(adopted).filter(function(k){ return adopted[k]; }).length;
+  h += '<a class="jump review" href="review/"><span><b>검수 페이지' +
+       (picked ? ' — ' + picked + '건 채택됨' : ' — 4건 검토 대기') + '</b>' +
+       '<small>' + (picked
+         ? '고른 안이 아래 일정과 예산에 반영돼 있습니다'
+         : '만타 스노클링 · 원숭이 · 조 편성 — 채택해야 일정에 들어갑니다') +
+       '</small></span><span class="arw">→</span></a>';
+
   if (tripIdx >= 0) {
-    var D = DAYS[tripIdx];
+    var D = dayOf(tripIdx);
     h += '<div class="hero"><span class="lbl">Day ' + (tripIdx+1) + ' of 5 · ' + D.d + ' (' + D.wd + ')</span>' +
          '<div class="big">' + esc(D.title) + '</div><p>' + esc(D.note) + '</p>' +
          '<div class="hero-meta"><span>인원 <b>14명</b></span><span>차량 <b>8인승 2대</b></span>' +
          '<span>숙소 <b>시라호</b></span></div></div>';
     h += '<div class="sec-label">오늘 경로</div>' + mapHTML(tripIdx);
-    h += '<div class="sec-label">오늘 동선</div><div class="card">' + stepsHTML(D.steps, tripIdx) + '</div>';
-    if (D.meals.length) h += mealsHTML(D.meals, tripIdx);
+    h += '<div class="sec-label">오늘 동선</div><div class="card">' + stepsHTML(D.steps, D.q) + '</div>';
+    if (D.meals.length) h += mealsHTML(D.meals, MEAL_Q[tripIdx]);
   } else if (afterTrip) {
     h += '<div class="hero"><span class="lbl">여행 종료</span>' +
          '<div class="big">잘 다녀오셨습니다</div>' +
@@ -870,21 +939,6 @@ function renderToday(){
          '<div class="hero-meta"><span>남은 할 일 <b>' + pending.length + '건</b></span>' +
          '<span>인원 <b>14명</b></span><span>숙소 <b>시라호</b></span></div></div>';
 
-    if (pending.length) {
-      h += '<div class="sec-label">먼저 처리할 것</div>';
-      pending.slice(0,3).forEach(function(t){
-        h += '<div class="card"><div class="t-top"><span class="t-name">' + esc(t.name) + '</span>' +
-             '<span class="t-tag">' + esc(t.tag) + '</span></div><div class="calls">';
-        if (t.tel) h += '<a class="btn" href="tel:' + t.tel.replace(/-/g,"") + '">📞 ' + t.tel + '</a>';
-        if (t.link) h += '<a class="btn ghost" href="' + t.link + '" target="_blank" rel="noopener">' + esc(t.linkLabel) + '</a>';
-        h += '</div></div>';
-      });
-      h += '<button class="jump" data-go="todo"><span><b>할 일 ' + pending.length + '건 전체 보기</b>' +
-           '<small>일본어 문의 스크립트가 항목마다 있습니다</small></span><span class="arw">→</span></button>';
-    } else {
-      h += '<div class="card"><div class="card-h"><h3>할 일을 전부 끝냈습니다</h3></div>' +
-           '<p style="font-size:13.5px;color:var(--ink-2)">예약이 다 잡혔습니다. 9/10 아침에 태풍 예보만 한 번 더 확인하세요.</p></div>';
-    }
   }
 
   var wet = WX.filter(function(w){ return w[4]; }).length;
@@ -915,11 +969,11 @@ function renderPlan(){
     return '<button class="dseg' + (tripIdx === i ? " today" : "") + '" data-day="' + i +
       '" aria-selected="' + (pickedDay === i) + '"><b>' + D.d.split("/")[1] + '</b><span>' + D.wd + '</span></button>';
   }).join("");
-  var D = DAYS[pickedDay];
+  var D = dayOf(pickedDay);
   var body = '<div class="card"><div class="card-h"><span class="stamp">DAY ' + (pickedDay+1) + ' · ' + D.d + ' ' + D.wd + '</span></div>' +
     '<div class="day-title">' + esc(D.title) + '</div><p class="day-sub">' + esc(D.note) + '</p></div>' +
     mapHTML(pickedDay) +
-    '<div class="card">' + stepsHTML(D.steps, pickedDay) + '</div>' + mealsHTML(D.meals, pickedDay);
+    '<div class="card">' + stepsHTML(D.steps, D.q) + '</div>' + mealsHTML(D.meals, MEAL_Q[pickedDay]);
   $("v-plan").innerHTML = '<div class="dayseg">' + segs + '</div>' + body;
 }
 
@@ -958,7 +1012,16 @@ function renderTodo(){
 
 /* ─── 예산 ─── */
 function renderMoney(){
-  var fixedSum = 0; FIXED.forEach(function(r){ fixedSum += r[1]; });
+  /* 검수에서 채택한 안의 비용을 얹습니다 */
+  var items = FIXED.slice();
+  if (adopted["manta-swap"]) {
+    items = items.filter(function(r){ return r[0] !== "스노클링 보트 전세"; });
+    items.unshift(["만타 + 산호 스노클링", 105000, "가비라 발 5시간 전세 · 상한값으로 잡음"]);
+  }
+  if (adopted["manta-extra"]) items.push(["만타 반나절 (희망자 7명)", 66500, "1인 9,500엔 × 7 — 개인 부담이면 0"]);
+  if (adopted["monkey"]) items.push(["야이마무라 입촌료", 15120, "1,080엔 × 14"]);
+
+  var fixedSum = 0; items.forEach(function(r){ fixedSum += r[1]; });
   var yak = facts.yak * PAX, fer = facts.fer * PAX, car = facts.car;
   var need = fixedSum + yak + fer + car;
   var have = FUND_KRW / facts.fx;
@@ -970,7 +1033,7 @@ function renderMoney(){
   rows += '<tr class="var"><td>야키니쿠 9/14<small>1인 ' + facts.yak.toLocaleString("en-US") + '엔 × 14</small></td><td class="r">' + yak.toLocaleString("en-US") + '</td></tr>';
   rows += '<tr class="var"><td>다케토미 페리<small>왕복 1인 ' + facts.fer.toLocaleString("en-US") + '엔 × 14</small></td><td class="r">' + fer.toLocaleString("en-US") + '</td></tr>';
   if (car > 0) rows += '<tr class="var"><td>렌터카<small>공금에서 지출</small></td><td class="r">' + car.toLocaleString("en-US") + '</td></tr>';
-  FIXED.forEach(function(r){
+  items.forEach(function(r){
     rows += '<tr><td>' + r[0] + '<small>' + r[2] + '</small></td><td class="r">' + r[1].toLocaleString("en-US") + '</td></tr>';
   });
   rows += '<tr class="sum"><td>필요액</td><td class="r">' + yen(need) + '</td></tr>';
@@ -1071,6 +1134,65 @@ var HOWS = [
   ["주의","인터넷이 있어야 열립니다","전화번호와 숙소 주소는 출발 전에 폰 연락처에 따로 저장해두세요"]
 ];
 
+/* ─── 조 편성 ───
+   14명을 7+7로 나눕니다. 핵심은 "조를 하나만 만드는 것" — 차 조, 페리 조,
+   물소수레 조를 따로 만들면 목적지마다 다시 세야 합니다. */
+var TEAM_ROLES = [
+  ["조장","인원 점검과 예약 확인. 목적지마다 <b>조장 둘이 7명씩만 세면</b> 14명이 7명처럼 움직입니다. 페리 QR도 조장이 하나씩 듭니다.","조당 1명"],
+  ["운전","<b>차당 2명</b>이 국제운전면허증을 갖고 교대합니다. 9/16 북부 드라이브는 왕복 4시간이 넘어 한 명으론 무리입니다.","조당 2명"],
+  ["총무","공금 카드와 정산 앱 입력. <b>여행 전체에 한 명</b>만 — 여러 명이 넣으면 같은 지출이 중복으로 잡힙니다.","전체 1명"],
+  ["길잡이","두 차 내비에 같은 목적지를 넣고, 앞차가 주차하면 옆자리를 잡아둡니다.","조당 1명"]
+];
+var SOBER = [
+  ["9/13","숙소 회식","불필요","마트에서 사와 숙소에서 먹으니 차를 안 씁니다"],
+  ["9/14","기타우치 야키니쿠","<b>2명</b>","시내 왕복 40분. A조·B조 운전자 각 1명"],
+  ["9/15","숙소","불필요","다케토미에서 돌아와 숙소에서 쉽니다"],
+  ["9/16","우사기야","<b>2명</b>","전날과 <b>다른</b> 2명으로. 그래야 각자 하루만 금주합니다"],
+  ["9/17","—","불필요","오전에 공항으로 갑니다"]
+];
+
+function teamsHTML(){
+  var h = '<p class="tlede">14명은 <b>A조 7명 / B조 7명</b>으로 나누고, 그 조를 5일 내내 그대로 씁니다. ' +
+    '차·페리·물소수레·글라스보트가 전부 둘로 쪼개지는 규모라 조를 하나로 통일하면 관리가 단순해집니다. ' +
+    '8인승에 7명이면 <b>한 자리가 남아</b> 젖은 짐과 아이스박스를 둘 수 있습니다.</p>';
+
+  h += '<div class="teams">';
+  ["A","B"].forEach(function(t){
+    h += '<div class="team"><div class="tname">' + t + '조 <span>7명</span></div>' +
+      '<ul><li>조장 1</li><li>운전 2 <small>(IDP 필수)</small></li><li>나머지 4</li></ul>' +
+      '<div class="tcar">8인승 ' + (t === "A" ? "1" : "2") + '호차 · 여유 1석</div></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="sub-label">역할</div><div class="roles">';
+  TEAM_ROLES.forEach(function(r){
+    h += '<div class="role"><div class="rname">' + r[0] + '<span>' + r[2] + '</span></div><p>' + r[1] + '</p></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="sub-label">금주 당번</div>' +
+    '<p class="tlede">일본은 음주운전 시 <b>동승자와 차를 내준 사람까지</b> 처벌합니다. 예외가 없습니다.</p>' +
+    '<div class="tscroll"><table><thead><tr><th>날짜</th><th>저녁</th><th>금주</th><th>메모</th></tr></thead><tbody>';
+  SOBER.forEach(function(s){
+    h += '<tr><td class="mono">' + s[0] + '</td><td>' + s[1] + '</td><td>' + s[2] + '</td><td><small>' + s[3] + '</small></td></tr>';
+  });
+  h += '</tbody></table></div>';
+
+  h += '<p class="note"><b>IDP를 4명 받아야 이 표가 굴러갑니다.</b> 2명이면 그 둘이 9/14와 9/16 모두 금주해야 하고, ' +
+    '9/16 북부 드라이브에서 교대할 사람도 없습니다. 평일 경찰서 당일 발급입니다.</p>';
+
+  h += '<div class="sub-label">둘로 쪼개지는 것들</div><div class="tscroll"><table>' +
+    '<thead><tr><th>언제</th><th>무엇</th><th>이유</th></tr></thead><tbody>' +
+    '<tr><td class="mono">상시</td><td>렌터카 2대</td><td>8인승 2대 · 7명씩</td></tr>' +
+    '<tr><td class="mono">9/15</td><td>안에이 페리 예약 2건</td><td><b>한 건에 대인 10명까지</b>라 7+7</td></tr>' +
+    '<tr><td class="mono">9/15</td><td>다케토미 물소 수레 2대</td><td>한 대에 14명이 안 탑니다</td></tr>' +
+    '<tr><td class="mono">9/16</td><td>가비라만 글라스보트 2척</td><td>정원 문제</td></tr>' +
+    '<tr><td class="mono">저녁</td><td>택시 3~4대</td><td>술 마시는 날 시내 왕복</td></tr>' +
+    '</tbody></table></div>' +
+    '<p class="tlede">전부 A조/B조 그대로 나누면 됩니다. <b>매번 새로 편을 짜지 마세요</b> — 14명이 모여서 정하는 데만 10분씩 걸립니다.</p>';
+  return h;
+}
+
 function renderInfo(){
   var dec = DECS.map(function(d){
     var opts = d[1].map(function(o){
@@ -1083,7 +1205,17 @@ function renderInfo(){
   var h = '<div class="vhead"><h2>배경과 준비물</h2>' +
     '<p>왜 이 일정이 됐는지, 아직 답이 없는 건 무엇인지, 각자 뭘 챙겨야 하는지.</p></div>';
 
-  h += '<details open><summary>두 계획서를 이렇게 합쳤습니다</summary><div class="dbody">' + dec + '</div></details>';
+  if (adopted["teams"]) {
+    h += '<details open><summary>A조 · B조 나누는 법</summary><div class="dbody">' + teamsHTML() + '</div></details>';
+  }
+  h += '<details><summary>남은 할 일 ' + TASKS.filter(function(t){ return !(checks[t.id] && checks[t.id].done); }).length +
+    '건 — 전화와 예약</summary><div class="dbody"><p class="tlede">항목별 상세와 일본어 문의 문장은 <b>할일 탭</b>에 있습니다. 여기서는 목록만 봅니다.</p><ul class="brief">' +
+    TASKS.map(function(t){
+      var done = checks[t.id] && checks[t.id].done;
+      return '<li class="' + (done ? "ok" : "") + '">' + (done ? "✓ " : "· ") + esc(t.name) +
+        (t.tel ? ' <a class="tinytel" href="tel:' + t.tel.replace(/-/g,"") + '">' + t.tel + '</a>' : '') + '</li>';
+    }).join("") + '</ul></div></details>';
+  h += '<details><summary>두 계획서를 이렇게 합쳤습니다</summary><div class="dbody">' + dec + '</div></details>';
   h += '<details><summary>아직 답이 없는 것 · 5</summary><div class="dbody"><ol class="olist">' +
     OPENS.map(function(o){ return '<li><strong>' + esc(o[0]) + '</strong><span>' + esc(o[1]) + '</span></li>'; }).join("") +
     '</ol></div></details>';

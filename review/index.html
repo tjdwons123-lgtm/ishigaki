@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>이시가키 검수</title>
+<meta name="description" content="새로 제안된 일정안을 검토하고 채택하면 메인 앱에 반영됩니다">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#081820" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="../icon-180.png">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+  --deep:#FFFFFF; --sheet:#F2F6F7; --shoal:#CFE6EC; --shoal-soft:#E6F1F4;
+  --ink:#0F2028; --ink-2:#3B535E; --ink-3:#6E838C;
+  --rule:#C3D2D6; --rule-soft:#DDE6E8;
+  --chart:#D10A6E; --chart-soft:#FDE8F1;
+  --warn:#B45309; --warn-soft:#FBEFDC;
+  --ok:#12695A; --ok-soft:#DDEFEA;
+  --card:#FFFFFF; --field:#F4F7F8; --bar:#FFFFFFEE;
+  --shadow:0 1px 3px rgba(15,32,40,.07);
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --deep:#081820; --sheet:#0B1E27; --shoal:#123A47; --shoal-soft:#0F2E39;
+  --ink:#E4EDF0; --ink-2:#A9BEC6; --ink-3:#7A939C;
+  --rule:#22434F; --rule-soft:#173039;
+  --chart:#FF5CA6; --chart-soft:#33101F;
+  --warn:#E9A63F; --warn-soft:#33260F;
+  --ok:#5CC9B0; --ok-soft:#0E2E2A;
+  --card:#0D2531; --field:#0A2029; --bar:#081820EE;
+  --shadow:0 1px 3px rgba(0,0,0,.45);
+}}
+:root[data-theme="dark"]{
+  --deep:#081820; --sheet:#0B1E27; --shoal:#123A47; --shoal-soft:#0F2E39;
+  --ink:#E4EDF0; --ink-2:#A9BEC6; --ink-3:#7A939C;
+  --rule:#22434F; --rule-soft:#173039; --chart:#FF5CA6; --chart-soft:#33101F;
+  --warn:#E9A63F; --warn-soft:#33260F; --ok:#5CC9B0; --ok-soft:#0E2E2A;
+  --card:#0D2531; --field:#0A2029; --bar:#081820EE;
+  --shadow:0 1px 3px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--sheet);color:var(--ink);line-height:1.65;
+  font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;overflow:hidden}
+h1,h2,h3,h4,p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--chart);outline-offset:2px}
+
+.appbar{flex:0 0 auto;background:var(--bar);backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid var(--rule-soft);
+  padding:calc(env(safe-area-inset-top) + 12px) 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px}
+.back{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink);
+  font-size:14px;font-weight:500}
+.back span.a{font-family:"IBM Plex Mono",monospace;color:var(--chart);font-size:16px}
+.count{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+  background:var(--ink);color:var(--deep);padding:5px 11px;border-radius:100px;white-space:nowrap}
+.count.some{background:var(--ok)}
+
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.wrap{max-width:640px;margin:0 auto;padding:22px 20px calc(env(safe-area-inset-bottom) + 40px)}
+
+.lede h1{font-family:"Gowun Batang",serif;font-size:26px;font-weight:700;line-height:1.3}
+.lede p{color:var(--ink-2);font-size:14px;margin-top:8px}
+.howto{background:var(--shoal-soft);border-radius:10px;padding:14px 16px;margin:16px 0 26px;
+  font-size:13px;color:var(--ink-2)}
+.howto b{color:var(--ink)}
+
+.grp{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);margin:30px 0 10px}
+.p{background:var(--card);border-radius:12px;box-shadow:var(--shadow);margin-bottom:14px;
+  overflow:hidden;border:1px solid transparent}
+.p.on{border-color:var(--ok)}
+.p-head{padding:18px 18px 0}
+.p-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.p-title{font-size:16.5px;font-weight:600;letter-spacing:-.01em;flex:1}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;padding:3px 8px;border-radius:100px;white-space:nowrap;
+  background:var(--chart-soft);color:var(--chart)}
+.tag.rec{background:var(--ok-soft);color:var(--ok)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.p-sum{font-size:13.5px;color:var(--ink-2);margin-top:8px}
+.facts{display:flex;flex-wrap:wrap;gap:0 20px;margin-top:12px;padding-top:12px;
+  border-top:1px solid var(--rule-soft);font-family:"IBM Plex Mono",monospace;
+  font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.facts b{color:var(--ink);font-weight:600}
+.pros{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;margin-top:14px}
+.pros h4{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+.pros ul{margin:0;padding-left:15px;font-size:12.5px;line-height:1.7;color:var(--ink-2)}
+.pros .con ul{color:var(--ink-2)}
+.pros li::marker{color:var(--ink-3)}
+.p-why{font-size:12.5px;color:var(--ink-2);margin-top:14px;padding:11px 13px;
+  background:var(--field);border-radius:8px;line-height:1.65}
+.p-why b{color:var(--ink)}
+.p-act{display:flex;gap:8px;padding:16px 18px 18px;margin-top:4px}
+.act{flex:1;border:1px solid var(--rule);background:var(--field);border-radius:100px;
+  padding:11px 8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ink-2)}
+.act:hover{border-color:var(--chart);color:var(--chart)}
+.act[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.act.no[aria-pressed="true"]{background:var(--ink-3);border-color:var(--ink-3);color:var(--deep)}
+.exc{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--warn);
+  padding:0 18px 14px;margin-top:-6px}
+
+.summary{background:var(--card);border-radius:12px;box-shadow:var(--shadow);
+  padding:18px;margin-top:30px}
+.summary h3{font-size:16px;font-weight:600;margin-bottom:12px}
+.srow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;
+  border-bottom:1px solid var(--rule-soft);font-size:13.5px}
+.srow:last-of-type{border-bottom:0}
+.srow .v{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+.srow.tot{border-top:1px solid var(--ink);border-bottom:0;font-weight:600;padding-top:12px;margin-top:4px}
+.srow.gap{color:var(--chart);font-weight:600;border:0;padding-top:2px}
+.empty{font-size:13px;color:var(--ink-3);padding:6px 0}
+.go{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  width:100%;margin-top:16px;background:var(--ink);color:var(--deep);border:0;
+  border-radius:10px;padding:15px 18px;cursor:pointer;text-decoration:none}
+.go b{font-size:14.5px}
+.go small{display:block;opacity:.7;font-size:12px;font-weight:400}
+.go .a{font-family:"IBM Plex Mono",monospace;font-size:16px}
+.foot{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);
+  text-align:center;margin-top:26px;letter-spacing:.06em;line-height:1.8}
+@media (max-width:420px){.pros{grid-template-columns:1fr;gap:12px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="appbar">
+  <a class="back" href="../"><span class="a">←</span> 이시가키 항해도</a>
+  <span class="count" id="count">0건 채택</span>
+</div>
+
+<div class="scroll">
+  <div class="wrap">
+    <div class="lede">
+      <h1>검수</h1>
+      <p>새로 조사한 안들입니다. <b>채택한 것만</b> 메인 앱의 일정·지도·예산에 들어갑니다.</p>
+    </div>
+    <div class="howto">
+      고르면 이 기기에 바로 저장되고, <b>뒤로 가면 반영돼 있습니다.</b> 언제든 다시 바꿀 수 있습니다.
+      다만 저장은 이 폰 안에서만 되니, 최종 결정은 단톡방에 알려주세요.
+    </div>
+    <div id="list"></div>
+    <div class="summary" id="summary"></div>
+    <p class="foot">2026.09.13 – 09.17 · 14 PAX<br>조사일 2026-09-06</p>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+var PAX = 14;
+
+var PROPOSALS = [
+  {
+    group: "1 · 만타가오리 스노클링",
+    id: "manta-swap",
+    title: "2일차를 통째로 만타 투어로 바꾸기",
+    tag: "추천", tagClass: "rec",
+    excludes: ["manta-extra"],
+    sum: "환상의 섬 대신 가비라 이시자키 만타 스크램블로 갑니다. 전원 참가, 5시간짜리 전세.",
+    facts: [["시기", "9~11월 번식기 — 조우율 최고"], ["비용", "약 ¥105,000 (전세)"],
+            ["이동", "포인트까지 배로 편도 45~50분"], ["난이도", "수심 5~10m · 수영 못해도 가능"]],
+    pro: ["9월이 1년 중 만타 조우율이 가장 높은 시기입니다",
+          "라이선스 불필요 — 구명조끼 입고 수면에서 봅니다",
+          "전세가 개별(9,500엔×14=133,000엔)보다 쌉니다",
+          "못 보면 바다거북 포인트로 바꿔줍니다"],
+    con: ["환상의 섬을 포기해야 합니다 — 14명 인생사진 스팟",
+          "편도 50분 뱃길이라 멀미 위험이 큽니다",
+          "야생이라 100%가 아닙니다",
+          "럭키클로버 98,000엔보다 7,000엔쯤 비쌉니다"],
+    why: "<b>둘 다 하려면 하루가 더 필요합니다.</b> 환상의 섬은 남서쪽, 만타는 북서쪽이라 방향이 정반대입니다. 만타를 꼭 보고 싶다면 이 교체가 가장 깔끔하고, 사진이 더 중요하면 지금 일정을 유지하세요.",
+    cost: { add: 105000, remove: 98000, label: "스노클링 보트 전세 → 만타 투어" }
+  },
+  {
+    group: "1 · 만타가오리 스노클링",
+    id: "manta-extra",
+    title: "환상의 섬은 그대로 두고, 희망자만 따로",
+    tag: "대안", tagClass: "",
+    excludes: ["manta-swap"],
+    sum: "2일차는 지금대로 환상의 섬. 만타는 보고 싶은 사람만 3일차 오후에 반나절로 추가합니다.",
+    facts: [["언제", "9/15 오후 — 다케토미에서 14:50 복귀 후"], ["비용", "1인 ¥9,500"],
+            ["인원", "7명 가정 시 ¥66,500"], ["소요", "약 3.5시간"]],
+    pro: ["환상의 섬과 만타를 둘 다 볼 수 있습니다",
+          "관심 없는 사람은 숙소에서 쉬면 됩니다",
+          "3일차 저녁이 숙소라 늦어져도 부담이 적습니다"],
+    con: ["다케토미 다녀와서 또 배를 탑니다 — 체력이 셉니다",
+          "오후 출항이면 15:00~18:30이라 빠듯합니다",
+          "조가 갈라져 차 배차를 다시 짜야 합니다",
+          "공금이면 부족액이 6.6만엔 더 늘어납니다"],
+    why: "<b>개인 부담으로 돌리면 공금에 영향이 없습니다.</b> 가고 싶은 사람끼리 그 자리에서 정산하는 쪽을 권합니다. 다만 3일차를 '쉬어가는 날'로 잡은 이유가 전날 회식 다음이라는 점은 기억하세요.",
+    cost: { add: 66500, remove: 0, label: "만타 반나절 (희망자 7명)" }
+  },
+  {
+    group: "2 · 원숭이",
+    id: "monkey",
+    title: "이시가키 야이마무라 — 리스자루노모리",
+    tag: "확인 필요", tagClass: "warn",
+    sum: "2일차 오후 자유시간에 넣습니다. 다람쥐원숭이가 반방사 상태로 있어 어깨나 손에 올라옵니다.",
+    facts: [["위치", "나구라만 서쪽 · 시내에서 15분"], ["시간", "09:00~17:30 · 무휴"],
+            ["비용", "입촌료 ¥1,080~ · 14명 ¥15,120"], ["전화", "0980-82-8798"]],
+    pro: ["2일차 오후가 원래 비어 있어 일정을 안 건드립니다",
+          "류큐 전통가옥과 나구라만 전망도 같이 봅니다",
+          "희망자만 가고 나머지는 숙소에서 쉬면 됩니다",
+          "비 오는 날 대안으로도 씁니다"],
+    con: ["<b>2026년 7월 20일부터 먹이주기 체험이 중단됐습니다</b>",
+          "야생이 아니라 테마파크 안의 사육 시설입니다",
+          "마을 체험 프로그램은 15:00에 끝납니다",
+          "입촌료가 1,080엔 '~'이라 실제 금액 확인이 필요합니다"],
+    why: "<b>이시가키에 야생 원숭이는 없습니다.</b> 섬에서 원숭이를 볼 수 있는 곳은 여기 하나뿐입니다. 먹이주기가 중단돼 기대치를 낮춰야 하지만, 원숭이가 사람 어깨에 올라오는 것 자체는 여전합니다. 예약 전에 전화로 입촌료와 먹이주기 재개 여부를 확인하세요.",
+    cost: { add: 15120, remove: 0, label: "야이마무라 입촌료 14명" }
+  },
+  {
+    group: "3 · 조 편성",
+    id: "teams",
+    title: "A조 7명 / B조 7명 — 5일 내내 고정",
+    tag: "추천", tagClass: "rec",
+    sum: "차·페리·물소수레·글라스보트가 전부 둘로 쪼개집니다. 조를 하나로 통일하고 역할과 금주 당번까지 미리 정합니다.",
+    facts: [["차량", "8인승 2대 · 7명씩 · 여유 1석"], ["역할", "조장 · 운전 2 · 총무 · 길잡이"],
+            ["금주", "9/14와 9/16에 각 2명"], ["IDP", "4명 필요"]],
+    pro: ["목적지마다 조장 둘이 7명씩만 세면 점검이 끝납니다",
+          "페리 예약이 한 건에 10명까지라 7+7이 그대로 맞습니다",
+          "금주 당번을 나누면 각자 하루만 술을 안 마십니다",
+          "8인승에 7명이라 남는 한 자리에 젖은 짐을 둡니다"],
+    con: ["조가 고정이라 친한 사람끼리 갈릴 수 있습니다",
+          "IDP가 4명 안 되면 표가 무너집니다",
+          "총무 한 명에게 정산이 몰립니다"],
+    why: "<b>매번 새로 편을 짜면 14명이 모여 정하는 데만 10분씩 걸립니다.</b> 첫날 체크인 때 한 번 정해두면 남은 나흘이 편합니다. 채택하면 정보 탭에 역할표와 금주 당번표가 생깁니다.",
+    cost: null
+  }
+];
+
+var $ = function(id){ return document.getElementById(id); };
+var esc = function(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
+var yen = function(n){ return (n < 0 ? "−¥" : "+¥") + Math.abs(Math.round(n)).toLocaleString("en-US"); };
+
+var adopted = {};
+try { adopted = JSON.parse(localStorage.getItem("isg-adopted") || "{}"); } catch(e){}
+
+function save(){
+  try { localStorage.setItem("isg-adopted", JSON.stringify(adopted)); } catch(e){}
+}
+
+function render(){
+  var lastGroup = "", h = "";
+  PROPOSALS.forEach(function(p){
+    if (p.group !== lastGroup) { h += '<div class="grp">' + esc(p.group) + '</div>'; lastGroup = p.group; }
+    var on = !!adopted[p.id];
+    h += '<div class="p' + (on ? " on" : "") + '"><div class="p-head"><div class="p-top">' +
+      '<span class="p-title">' + esc(p.title) + '</span>' +
+      '<span class="tag ' + p.tagClass + '">' + esc(p.tag) + '</span></div>' +
+      '<p class="p-sum">' + esc(p.sum) + '</p>';
+
+    h += '<div class="facts">' + p.facts.map(function(f){
+      return '<span>' + esc(f[0]) + ' <b>' + esc(f[1]) + '</b></span>';
+    }).join("") + '</div>';
+
+    h += '<div class="pros"><div><h4>좋은 점</h4><ul>' +
+      p.pro.map(function(x){ return "<li>" + x + "</li>"; }).join("") + '</ul></div>' +
+      '<div class="con"><h4>걸리는 점</h4><ul>' +
+      p.con.map(function(x){ return "<li>" + x + "</li>"; }).join("") + '</ul></div></div>';
+
+    h += '<p class="p-why">' + p.why + '</p></div>';
+
+    h += '<div class="p-act">' +
+      '<button class="act yes" type="button" data-id="' + p.id + '" data-v="1" aria-pressed="' + on + '">채택</button>' +
+      '<button class="act no" type="button" data-id="' + p.id + '" data-v="0" aria-pressed="' + (!on) + '">보류</button>' +
+      '</div>';
+
+    if (p.excludes && p.excludes.some(function(x){ return adopted[x]; })) {
+      h += '<p class="exc">↑ 위 안과 함께 쓸 수 없어 자동으로 해제됩니다</p>';
+    }
+    h += '</div>';
+  });
+  $("list").innerHTML = h;
+
+  /* 요약 */
+  var picked = PROPOSALS.filter(function(p){ return adopted[p.id]; });
+  var s = '<h3>채택한 안</h3>';
+  if (!picked.length) {
+    s += '<p class="empty">아직 고른 게 없습니다. 채택하지 않으면 메인 앱은 지금 일정 그대로입니다.</p>';
+  } else {
+    var delta = 0;
+    picked.forEach(function(p){
+      var d = p.cost ? (p.cost.add - p.cost.remove) : 0;
+      delta += d;
+      s += '<div class="srow"><span>' + esc(p.title) + '</span><span class="v">' +
+           (p.cost ? yen(d) : "비용 없음") + '</span></div>';
+    });
+    s += '<div class="srow tot"><span>예산 변동</span><span class="v">' + yen(delta) + '</span></div>';
+    s += '<div class="srow gap"><span>1인당</span><span class="v">' +
+         yen(delta / PAX) + '</span></div>';
+  }
+  s += '<a class="go" href="../"><span><b>메인 앱으로 돌아가기</b>' +
+       '<small>일정 · 지도 · 예산에 바로 반영됩니다</small></span><span class="a">→</span></a>';
+  $("summary").innerHTML = s;
+
+  var n = picked.length;
+  $("count").textContent = n + "건 채택";
+  $("count").className = "count" + (n ? " some" : "");
+}
+
+$("list").addEventListener("click", function(e){
+  var b = e.target.closest(".act");
+  if (!b) return;
+  var id = b.getAttribute("data-id");
+  var yes = b.getAttribute("data-v") === "1";
+  adopted[id] = yes;
+  if (yes) {
+    /* 서로 배타적인 안은 하나만 남깁니다 */
+    var p = PROPOSALS.filter(function(x){ return x.id === id; })[0];
+    if (p && p.excludes) p.excludes.forEach(function(x){ adopted[x] = false; });
+  }
+  save();
+  render();
+});
+
+render();
+
+})();
+</script>
+</body>
+</html>
