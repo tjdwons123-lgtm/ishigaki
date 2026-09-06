@@ -2,7 +2,7 @@
    현지에서 데이터가 없어도 열리게 합니다.
    내용을 고쳐서 다시 올릴 때는 아래 VERSION 숫자만 올리세요. */
 
-var VERSION = "v3";
+var VERSION = "v4";
 var SHELL = "isg-shell-" + VERSION;
 var RUNTIME = "isg-runtime-" + VERSION;
 
@@ -50,6 +50,21 @@ self.addEventListener("fetch", function(e){
           return hit || caches.match("./");
         });
       })
+    );
+    return;
+  }
+
+  /* 날씨 예보는 절대 캐시를 먼저 주면 안 됩니다 — 매번 새로 받아야 갱신됩니다.
+     인터넷이 없을 때만 마지막으로 받아둔 응답을 돌려줍니다. */
+  if (req.url.indexOf("api.open-meteo.com") !== -1) {
+    e.respondWith(
+      fetch(req).then(function(res){
+        if (res && res.ok) {
+          var copy = res.clone();
+          caches.open(RUNTIME).then(function(c){ c.put(req, copy); });
+        }
+        return res;
+      }).catch(function(){ return caches.match(req); })
     );
     return;
   }

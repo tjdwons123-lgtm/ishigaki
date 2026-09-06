@@ -188,6 +188,11 @@ button{font:inherit;color:inherit}
 .note{font-size:13px;color:var(--ink-2);margin-top:14px;padding-left:12px;
   border-left:2px solid var(--chart)}
 .note b{color:var(--ink)}
+.src{font-size:11.5px;color:var(--ink-3);margin-top:9px;
+  font-family:"IBM Plex Mono",monospace}
+button.stamp{background:none;border:0;padding:4px 0 4px 8px;cursor:pointer;
+  font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-3);letter-spacing:.08em}
+button.stamp:hover{color:var(--chart)}
 
 /* ═══ 일정 ═══ */
 .dayseg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:16px;
@@ -206,6 +211,31 @@ button{font:inherit;color:inherit}
 .meal .m{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;
   color:var(--ink-3);min-width:32px;padding-top:3px;text-transform:uppercase}
 .meal small{display:block;color:var(--ink-3);font-size:12.5px;margin-top:1px}
+
+/* ═══ 설치 안내 ═══ */
+.install{background:var(--shoal-soft);border:1px solid var(--shoal);border-radius:12px;
+  padding:16px 18px;margin-bottom:14px;position:relative}
+.install h3{font-size:15px;font-weight:600;padding-right:24px;letter-spacing:-.01em}
+.install p{font-size:13px;color:var(--ink-2);margin-top:6px}
+.install ol{margin:10px 0 0;padding-left:0;list-style:none;counter-reset:st;
+  display:flex;flex-direction:column;gap:7px}
+.install li{counter-increment:st;position:relative;padding-left:26px;font-size:13.5px}
+.install li::before{content:counter(st);position:absolute;left:0;top:1px;
+  font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--chart);
+  border:1px solid var(--chart);width:18px;height:18px;line-height:16px;
+  text-align:center;border-radius:50%}
+.install li b{font-weight:600}
+.install .ic{display:inline-flex;vertical-align:-3px;margin:0 1px}
+.install .ic svg{width:15px;height:15px;stroke:var(--chart);fill:none;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round}
+.install .why{margin-top:11px;padding-top:11px;border-top:1px solid var(--shoal);
+  font-size:12.5px;color:var(--ink-2)}
+.install .why b{color:var(--ink);font-weight:600}
+.xclose{position:absolute;top:10px;right:10px;width:28px;height:28px;border:0;
+  background:none;cursor:pointer;color:var(--ink-3);font-size:19px;line-height:1;
+  border-radius:50%;display:flex;align-items:center;justify-content:center}
+.xclose:hover{background:var(--shoal);color:var(--ink)}
+.btn-install{margin-top:12px}
 
 /* ═══ 지도 ═══ */
 .mapcard{padding-bottom:14px}
@@ -471,13 +501,66 @@ var DAYS = [
     ], meals:[] }
 ];
 
-var WX = [
+/* 날씨 — 9/6에 확인한 값을 기본으로 깔고, 인터넷이 되면 최신 예보로 덮어씁니다.
+   [날짜, 아이콘, 기온, 강수확률, 강수확률높음, 스노클링날] */
+var WX_FALLBACK = [
   ["9/13 일","🌦️","32 / 27","50%",1,0],
   ["9/14 월","☀️","31 / 27","20%",0,1],
   ["9/15 화","☀️","31 / 26","20%",0,0],
   ["9/16 수","☀️","32 / 26","20%",0,0],
   ["9/17 목","☀️","31 / 26","40%",0,0]
 ];
+var WX = WX_FALLBACK;
+var wxAt = 0;          /* 예보를 마지막으로 받아온 시각 */
+var wxLive = false;
+
+/* 세계기상기구(WMO) 날씨 코드 → 아이콘 */
+function wmo(c){
+  if (c === 0) return "☀️";
+  if (c === 1) return "🌤️";
+  if (c === 2) return "⛅";
+  if (c === 3) return "☁️";
+  if (c === 45 || c === 48) return "🌫️";
+  if (c >= 51 && c <= 57) return "🌦️";
+  if (c >= 61 && c <= 65) return "🌧️";
+  if (c >= 80 && c <= 82) return "🌦️";
+  if (c >= 95) return "⛈️";
+  return "☁️";
+}
+
+/* Open-Meteo — 무료, API 키 없음, 브라우저에서 바로 호출됩니다.
+   실패하면 아무것도 하지 않습니다. 화면엔 이미 기본값이 그려져 있습니다. */
+function fetchWx(force){
+  if (!force && Date.now() - wxAt < 3600000) return;   /* 한 시간에 한 번이면 충분 */
+  if (afterTrip) return;
+  var u = "https://api.open-meteo.com/v1/forecast" +
+    "?latitude=24.3448&longitude=124.1572" +
+    "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
+    "&timezone=Asia%2FTokyo&start_date=" + TRIP[0] + "&end_date=" + TRIP[4];
+
+  fetch(u).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
+    var d = j && j.daily;
+    if (!d || !d.time || d.time.length !== 5) return;
+    WX = d.time.map(function(iso, i){
+      var base = WX_FALLBACK[i];
+      var pop = d.precipitation_probability_max[i];
+      var hi = Math.round(d.temperature_2m_max[i]);
+      var lo = Math.round(d.temperature_2m_min[i]);
+      return [
+        base[0],
+        wmo(d.weather_code[i]),
+        (isFinite(hi) ? hi : "–") + " / " + (isFinite(lo) ? lo : "–"),
+        (pop == null ? "–" : pop + "%"),
+        (pop != null && pop >= 50) ? 1 : 0,
+        base[5]
+      ];
+    });
+    wxAt = Date.now();
+    wxLive = true;
+    save("isg-wx", { at: wxAt, days: WX });
+    if (current === "today") renderToday();
+  }).catch(function(){});
+}
 
 /* ─── 지도 ───
    타일 지도를 쓰지 않는 이유: 인터넷이 있어야 뜹니다. 오프라인이 이 앱의
@@ -718,10 +801,53 @@ function wxHTML(){
   }).join("") + "</div>";
 }
 
+/* ─── 홈 화면에 추가 안내 ───
+   이미 홈 화면에서 열었으면 보여줄 이유가 없습니다. 안드로이드는 브라우저가
+   설치 프롬프트를 넘겨주면 버튼 한 번으로 끝나고, 아이폰은 사파리가 그걸
+   지원하지 않아 손으로 하는 방법을 적어줍니다. */
+var installEvt = null;
+var installed = false;
+try {
+  installed = window.matchMedia("(display-mode: standalone)").matches ||
+              window.navigator.standalone === true;
+} catch(e){}
+var hidInstall = false;
+try { hidInstall = localStorage.getItem("isg-hide-install") === "1"; } catch(e){}
+var IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+var SHARE_ICON = '<span class="ic"><svg viewBox="0 0 24 24"><path d="M12 15V3M12 3L8 7M12 3l4 4"/>' +
+  '<path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg></span>';
+var MENU_ICON = '<span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.3"/>' +
+  '<circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="19" r="1.3"/></svg></span>';
+
+function installHTML(){
+  if (installed || hidInstall) return "";
+  var h = '<div class="install"><button class="xclose" type="button" data-hide="install" ' +
+          'aria-label="안내 닫기">×</button>' +
+          '<h3>홈 화면에 추가하면 앱처럼 열립니다</h3>' +
+          '<p>주소창 없이 전체화면으로 뜨고, 아이콘이 하나 생깁니다.</p>';
+
+  if (installEvt) {
+    h += '<button class="btn btn-install" type="button" data-install="1">홈 화면에 추가</button>';
+  } else if (IOS) {
+    h += '<ol><li>사파리 아래쪽 <b>공유 버튼</b>' + SHARE_ICON + '을 누릅니다</li>' +
+         '<li>목록을 내려 <b>홈 화면에 추가</b>를 누릅니다</li>' +
+         '<li>오른쪽 위 <b>추가</b>를 누르면 끝입니다</li></ol>';
+  } else {
+    h += '<ol><li>크롬 오른쪽 위 <b>메뉴</b>' + MENU_ICON + '를 누릅니다</li>' +
+         '<li><b>홈 화면에 추가</b> 또는 <b>앱 설치</b>를 누릅니다</li></ol>';
+  }
+
+  h += '<p class="why"><b>이시가키에서 데이터가 없어도 열립니다.</b> 한 번 추가해두면 ' +
+       '일정·전화번호·지도가 폰 안에 저장돼, 비행기 안이나 로밍이 끊긴 곳에서도 그대로 뜹니다.</p></div>';
+  return h;
+}
+
 /* ─── 오늘 ─── */
 function renderToday(){
   var pending = TASKS.filter(function(t){ return !(checks[t.id] && checks[t.id].done); });
-  var h = "";
+  var h = installHTML();
 
   if (tripIdx >= 0) {
     var D = DAYS[tripIdx];
@@ -761,11 +887,22 @@ function renderToday(){
     }
   }
 
-  h += '<div class="sec-label">기상 — 5일 내내 맑음</div>';
-  h += '<div class="card"><div class="card-h"><h3>태풍 24호는 반대 방향</h3>' +
-       '<span class="stamp">2026-09-06 확인</span></div>' + wxHTML() +
-       '<p class="note"><b>9/10 아침이 진짜 판단 시점입니다.</b> 태풍은 발생부터 이시가키 도달까지 3~5일이라, ' +
-       '지금 안 보이는 태풍이 9/8~9/10에 생기면 여행 기간에 닿습니다. 럭키클로버 무료 취소 기한(9/12 정오)보다 이틀 앞서니 타이밍은 맞습니다.</p></div>';
+  var wet = WX.filter(function(w){ return w[4]; }).length;
+  var stamp = wxAt
+    ? "갱신 " + new Date(wxAt).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})
+    : "2026-09-06 확인 · 오프라인";
+  h += '<div class="sec-label">기상 — ' +
+       (wet === 0 ? "5일 내내 맑음" : "비 예보 " + wet + "일") + '</div>';
+  h += '<div class="card"><div class="card-h"><h3>이시가키 5일 예보</h3>' +
+       '<button class="stamp refresh" type="button" data-refresh="wx">' + esc(stamp) + ' ↻</button></div>' +
+       wxHTML() +
+       '<p class="src">' + (wxLive
+         ? "Open-Meteo · 여러 기상모델 혼합값 · 열 때마다 자동 갱신"
+         : "마지막으로 받아둔 값입니다. 인터넷에 연결되면 자동으로 갱신됩니다.") + '</p>' +
+       '<p class="note"><b>일주일 앞 예보는 모델마다 갈립니다.</b> 9/6 기준으로 일본 tenki.jp는 강수확률 20~50%에 대체로 맑음, ' +
+       '위 글로벌 혼합 모델은 40~55%에 곳에 따라 비로 나왔습니다. 어느 쪽이 맞다기보다 <b>아직 확정할 단계가 아니라는 뜻</b>입니다. ' +
+       '<b>9/10 아침이 판단 시점입니다</b> — 태풍은 발생부터 도달까지 3~5일이고, 럭키클로버 무료 취소 기한(9/12 정오)보다 이틀 앞섭니다. ' +
+       '그때 이 화면을 다시 열면 최신 숫자로 바뀌어 있습니다.</p></div>';
 
   h += '<button class="jump" data-go="plan"><span><b>5일 일정 전체 보기</b>' +
        '<small>날짜별 동선과 식사</small></span><span class="arw">→</span></button>';
@@ -986,6 +1123,20 @@ $("tabbar").addEventListener("click", function(e){
 
 /* ─── 화면 안 상호작용 ─── */
 $("views").addEventListener("click", function(e){
+  if (e.target.closest("[data-hide=install]")) {
+    hidInstall = true;
+    try { localStorage.setItem("isg-hide-install", "1"); } catch(err){}
+    renderToday();
+    return;
+  }
+  if (e.target.closest("[data-install]")) {
+    if (!installEvt) return;
+    installEvt.prompt();
+    installEvt.userChoice.then(function(){ installEvt = null; renderToday(); });
+    return;
+  }
+  if (e.target.closest("[data-refresh=wx]")) { fetchWx(true); return; }
+
   var jump = e.target.closest("[data-go]");
   if (jump) { show(jump.getAttribute("data-go")); return; }
 
@@ -1024,10 +1175,32 @@ $("views").addEventListener("input", function(e){
 });
 
 /* ─── 시작 ─── */
+
+/* 지난번에 받아둔 예보가 있으면 먼저 그립니다 — 오프라인이어도 최신에 가깝게 */
+var cached = load("isg-wx", null);
+if (cached && cached.days && cached.days.length === 5) { WX = cached.days; wxAt = cached.at || 0; wxLive = true; }
+
+/* 안드로이드 크롬이 설치 프롬프트를 넘겨주면 버튼으로 바꿔 답니다 */
+window.addEventListener("beforeinstallprompt", function(e){
+  e.preventDefault();
+  installEvt = e;
+  if (current === "today") renderToday();
+});
+window.addEventListener("appinstalled", function(){
+  installed = true;
+  if (current === "today") renderToday();
+});
+
 if (tripIdx >= 0) { pickedDay = tripIdx; $("chip").textContent = "DAY " + (tripIdx+1); $("chip").className = "chip live"; }
 else if (afterTrip) { $("chip").textContent = "종료"; $("chip").className = "chip live"; }
 else { $("chip").textContent = "D-" + daysLeft; }
 show("today");
+fetchWx(false);
+
+/* 앱으로 돌아올 때 한 번씩 다시 확인합니다 */
+document.addEventListener("visibilitychange", function(){
+  if (!document.hidden) fetchWx(false);
+});
 
 })();
 </script>
