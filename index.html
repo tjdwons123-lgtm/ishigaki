@@ -6,8 +6,8 @@
 <title>이시가키 항해도</title>
 <meta name="description" content="2026.09.13-17 이시가키 14인 여행 · 일정, 예약 체크리스트, 공금 계산기">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#081820" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#7FE0D8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1E7F7A" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -24,61 +24,69 @@ img{max-width:100%}
 <body>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
 <style>
 :root{
-  /* 해도(nautical chart) 팔레트 — 흰 심해, 얕은 여울의 청록, 육지의 황갈, 항로 표시의 마젠타 */
+  /* 이시가키 — 산호모래, 얕은 라군, 류큐 붉은 기와, 부겐빌레아 */
   --deep:#FFFFFF;
-  --sheet:#F2F6F7;
-  --shoal:#CFE6EC;
-  --shoal-soft:#E6F1F4;
-  --land-soft:#F7EFDD;
-  --sea:#E6F1F4;
-  --isle:#F7EFDD;
-  --ink:#0F2028;
-  --ink-2:#3B535E;
-  --ink-3:#6E838C;
-  --rule:#C3D2D6;
-  --rule-soft:#DDE6E8;
-  --chart:#D10A6E;
-  --chart-soft:#FDE8F1;
-  --warn:#B45309;
-  --warn-soft:#FBEFDC;
-  --ok:#12695A;
-  --ok-soft:#DDEFEA;
+  --sheet:#FFF8EE;
+  --shoal:#A9E6E1;
+  --shoal-soft:#E0F6F3;
+  --land-soft:#FCE9DC;
+  --sea:#DFF5F2;
+  --isle:#FBE7DC;
+  --lagoon:#3FC2BA;
+  --kawara:#DE7048;
+  --ink:#2C4A52;
+  --ink-2:#557179;
+  --ink-3:#8AA3A9;
+  --rule:#D6E4E2;
+  --rule-soft:#EAF2F0;
+  --chart:#E0457E;
+  --chart-soft:#FDE6EF;
+  --warn:#C2621F;
+  --warn-soft:#FDEEDF;
+  --ok:#12897A;
+  --ok-soft:#DBF2EE;
   --card:#FFFFFF;
-  --field:#F4F7F8;
-  --bar:#FFFFFFEE;
-  --shadow:0 1px 3px rgba(15,32,40,.07);
-  --lift:0 2px 10px rgba(15,32,40,.09);
+  --field:#F5FAF9;
+  --bar:#FFFDF9F2;
+  --shadow:0 2px 8px rgba(44,74,82,.07);
+  --lift:0 6px 20px rgba(44,74,82,.11);
+  --r:18px; --r-sm:14px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --deep:#081820; --sheet:#0B1E27; --shoal:#123A47; --shoal-soft:#0F2E39; --land-soft:#221E13; --sea:#0A2833; --isle:#241F14;
-    --ink:#E4EDF0; --ink-2:#A9BEC6; --ink-3:#7A939C;
-    --rule:#22434F; --rule-soft:#173039;
-    --chart:#FF5CA6; --chart-soft:#33101F;
-    --warn:#E9A63F; --warn-soft:#33260F;
-    --ok:#5CC9B0; --ok-soft:#0E2E2A;
-    --card:#0D2531; --field:#0A2029; --bar:#081820EE;
-    --shadow:0 1px 3px rgba(0,0,0,.45); --lift:0 2px 10px rgba(0,0,0,.5);
+    --deep:#0B1F26; --sheet:#0E2229; --shoal:#1D5C5A; --shoal-soft:#123A3B; --land-soft:#2E2018;
+    --sea:#123A3B; --isle:#2E2018; --lagoon:#4FD3C9; --kawara:#F09166;
+    --ink:#E6F2F0; --ink-2:#AFC8C7; --ink-3:#7D9B9C;
+    --rule:#254449; --rule-soft:#173236;
+    --chart:#FF7FB0; --chart-soft:#3A1223;
+    --warn:#EFA059; --warn-soft:#33240F;
+    --ok:#57D2BE; --ok-soft:#0E332E;
+    --card:#132D34; --field:#102830; --bar:#0E2229F2;
+    --shadow:0 2px 8px rgba(0,0,0,.4); --lift:0 6px 20px rgba(0,0,0,.5);
   }
 }
 :root[data-theme="dark"]{
-  --deep:#081820; --sheet:#0B1E27; --shoal:#123A47; --shoal-soft:#0F2E39; --land-soft:#221E13; --sea:#0A2833; --isle:#241F14;
-  --ink:#E4EDF0; --ink-2:#A9BEC6; --ink-3:#7A939C;
-  --rule:#22434F; --rule-soft:#173039;
-  --chart:#FF5CA6; --chart-soft:#33101F;
-  --warn:#E9A63F; --warn-soft:#33260F;
-  --ok:#5CC9B0; --ok-soft:#0E2E2A;
-  --card:#0D2531; --field:#0A2029; --bar:#081820EE;
-  --shadow:0 1px 3px rgba(0,0,0,.45); --lift:0 2px 10px rgba(0,0,0,.5);
+  --deep:#0B1F26; --sheet:#0E2229; --shoal:#1D5C5A; --shoal-soft:#123A3B; --land-soft:#2E2018;
+  --sea:#123A3B; --isle:#2E2018; --lagoon:#4FD3C9; --kawara:#F09166;
+  --ink:#E6F2F0; --ink-2:#AFC8C7; --ink-3:#7D9B9C;
+  --rule:#254449; --rule-soft:#173236;
+  --chart:#FF7FB0; --chart-soft:#3A1223;
+  --warn:#EFA059; --warn-soft:#33240F;
+  --ok:#57D2BE; --ok-soft:#0E332E;
+  --card:#132D34; --field:#102830; --bar:#0E2229F2;
+  --shadow:0 2px 8px rgba(0,0,0,.4); --lift:0 6px 20px rgba(0,0,0,.5);
 }
 
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
-  margin:0;background:var(--sheet);color:var(--ink);
+  margin:0;color:var(--ink);
+  background:var(--sheet);
+  background-image:radial-gradient(circle at 1px 1px, rgba(63,194,186,.10) 1px, transparent 0);
+  background-size:22px 22px;
   font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   line-height:1.65;-webkit-font-smoothing:antialiased;
   display:flex;flex-direction:column;overflow:hidden;
@@ -86,6 +94,57 @@ body{
 h1,h2,h3,h4,p{margin:0}
 :focus-visible{outline:2px solid var(--chart);outline-offset:2px}
 button{font:inherit;color:inherit}
+
+/* ═══ 해변 ═══
+   상단바는 하늘에서 라군으로 내려가는 그라디언트, 아래는 밀려온 파도 곡선.
+   파도는 SVG를 data URI로 넣어 오프라인에서도 그대로 뜹니다. */
+.appbar{
+  background:linear-gradient(180deg,#7FE0D8 0%, var(--lagoon) 100%)!important;
+  border-bottom:0!important;position:relative;color:#083B3F;
+}
+:root[data-theme="dark"] .appbar,
+:root:not([data-theme="light"]) .appbar{color:#062B2E}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .appbar{
+  background:linear-gradient(180deg,#1E7F7A 0%,#12615E 100%)!important;color:#DFF6F3}}
+:root[data-theme="dark"] .appbar{
+  background:linear-gradient(180deg,#1E7F7A 0%,#12615E 100%)!important;color:#DFF6F3}
+.appbar::after{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:14px;
+  background:var(--sheet);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 14' preserveAspectRatio='none'%3E%3Cpath d='M0 14V6c10-6 20 6 30 0s20-6 30 0 20 6 30 0 20-6 30 0v8z' fill='%23fff'/%3E%3C/svg%3E") repeat-x bottom/120px 14px;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 14' preserveAspectRatio='none'%3E%3Cpath d='M0 14V6c10-6 20 6 30 0s20-6 30 0 20 6 30 0 20-6 30 0v8z' fill='%23fff'/%3E%3C/svg%3E") repeat-x bottom/120px 14px;
+}
+.appbar .brand b{color:inherit;letter-spacing:0}
+.appbar .brand span{color:inherit;opacity:.72}
+.appbar .chip{background:#fff;color:var(--chart);box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.appbar .chip.live{background:#fff;color:var(--ok)}
+
+/* 히어로 — 라군에 떠 있는 카드 */
+.hero{
+  background:linear-gradient(165deg, var(--shoal-soft) 0%, var(--card) 62%)!important;
+  border-top:0!important;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;right:-30px;top:-40px;width:150px;height:150px;
+  border-radius:50%;background:var(--shoal);opacity:.38;
+}
+.hero > *{position:relative}
+
+/* 섹션 라벨 밑에 잔물결 */
+.sec-label{display:flex;align-items:center;gap:9px}
+.sec-label::after{
+  content:"";flex:1;height:6px;opacity:.5;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 6'%3E%3Cpath d='M0 3c5-4 10 4 15 0s10-4 15 0 8 2 10 0' fill='none' stroke='%233FC2BA' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x center/40px 6px;
+}
+
+/* 탭바 — 알약 모양 */
+.tabbar{border-top:1px solid var(--rule-soft)!important}
+.tab{border-top:0!important;margin-top:0!important;padding:8px 2px 7px;position:relative}
+.tab[aria-selected="true"]{color:#fff;font-weight:600}
+.tab[aria-selected="true"]::before{
+  content:"";position:absolute;inset:4px 6px 3px;border-radius:14px;
+  background:var(--lagoon);z-index:-1;
+}
 
 /* ═══ 앱 셸 ═══ */
 .appbar{
@@ -95,7 +154,7 @@ button{font:inherit;color:inherit}
   display:flex;align-items:center;justify-content:space-between;gap:12px;
 }
 .brand{display:flex;flex-direction:column;line-height:1.25;min-width:0}
-.brand b{font-family:"Gowun Batang",serif;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.brand b{font-family:"Jua",sans-serif;font-size:17px;font-weight:700;letter-spacing:-.01em}
 .brand span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);letter-spacing:.06em}
 .chip{
   font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
@@ -127,9 +186,9 @@ button{font:inherit;color:inherit}
 
 /* ═══ 공통 ═══ */
 .vhead{margin-bottom:16px}
-.vhead h2{font-family:"Gowun Batang",serif;font-size:23px;font-weight:700;line-height:1.28}
+.vhead h2{font-family:"Jua",sans-serif;font-size:23px;font-weight:700;line-height:1.28}
 .vhead p{color:var(--ink-2);font-size:13.5px;margin-top:6px}
-.card{background:var(--card);border-radius:12px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+.card{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
 .card.flush{padding:0;overflow:hidden}
 .card-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;
   flex-wrap:wrap;margin-bottom:10px}
@@ -141,11 +200,11 @@ button{font:inherit;color:inherit}
 .sec-label:first-child{margin-top:0}
 
 /* ═══ 오늘 ═══ */
-.hero{background:var(--card);border-radius:14px;padding:22px;box-shadow:var(--lift);
+.hero{border-radius:22px;padding:22px;box-shadow:var(--lift);
   margin-bottom:14px;border-top:3px solid var(--chart)}
 .hero .lbl{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--ink-3)}
-.hero .big{font-family:"Gowun Batang",serif;font-size:clamp(30px,9vw,40px);
+.hero .big{font-family:"Jua",sans-serif;font-size:clamp(30px,9vw,40px);
   font-weight:700;line-height:1.1;margin:8px 0 6px;letter-spacing:-.02em}
 .hero .cnt{font-family:"IBM Plex Mono",monospace;font-size:44px;font-weight:600;
   line-height:1;color:var(--chart);font-variant-numeric:tabular-nums}
@@ -166,7 +225,7 @@ button{font:inherit;color:inherit}
 .mini.key .mini-t{color:var(--chart);font-weight:600}
 
 .jump{display:block;width:100%;text-align:left;background:var(--shoal-soft);
-  border:0;border-radius:10px;padding:14px 16px;cursor:pointer;margin-bottom:14px;
+  border:0;border-radius:var(--r);padding:14px 16px;cursor:pointer;margin-bottom:14px;
   display:flex;align-items:center;justify-content:space-between;gap:12px}
 .jump:hover{background:var(--shoal)}
 a.jump{text-decoration:none;color:inherit}
@@ -178,8 +237,8 @@ a.jump.review:hover small,a.jump.review:hover .arw{color:#fff}
 .jump .arw{font-family:"IBM Plex Mono",monospace;color:var(--chart);font-size:16px;flex:0 0 auto}
 
 /* ═══ 날씨 ═══ */
-.wx-days{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--rule-soft);
-  border-radius:9px;overflow:hidden;border:1px solid var(--rule-soft)}
+.wx-days{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:var(--rule-soft);
+  border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--rule-soft)}
 .wx-day{background:var(--card);padding:11px 6px;display:flex;flex-direction:column;
   gap:4px;align-items:center}
 .wx-day.best{background:var(--shoal-soft)}
@@ -201,23 +260,23 @@ button.stamp:hover{color:var(--chart)}
 /* ═══ 일정 ═══ */
 .dayseg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:16px;
   position:sticky;top:0;z-index:2;background:var(--sheet);padding:2px 0 10px}
-.dseg{background:var(--card);border:1px solid var(--rule-soft);border-radius:9px;
+.dseg{background:var(--card);border:2px solid var(--rule-soft);border-radius:var(--r-sm);
   padding:9px 2px;cursor:pointer;display:flex;flex-direction:column;gap:1px;align-items:center}
 .dseg b{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
 .dseg span{font-size:10px;color:var(--ink-3)}
 .dseg[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--deep)}
 .dseg[aria-selected="true"] span{color:var(--deep);opacity:.75}
 .dseg.today{border-color:var(--chart)}
-.day-title{font-family:"Gowun Batang",serif;font-size:21px;font-weight:700;line-height:1.3}
+.day-title{font-family:"Jua",sans-serif;font-size:21px;font-weight:700;line-height:1.3}
 .day-sub{color:var(--ink-2);font-size:13.5px;margin-top:6px}
-.meal{display:flex;gap:12px;background:var(--land-soft);padding:12px 14px;
-  border-radius:9px;font-size:13.5px;align-items:flex-start;margin-top:10px}
+.meal{display:flex;gap:12px;background:var(--land-soft);padding:13px 15px;
+  border-radius:var(--r-sm);font-size:13.5px;align-items:flex-start;margin-top:10px}
 .meal .m{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;
   color:var(--ink-3);min-width:32px;padding-top:3px;text-transform:uppercase}
 .meal small{display:block;color:var(--ink-3);font-size:12.5px;margin-top:1px}
 
 /* ═══ 설치 안내 ═══ */
-.install{background:var(--shoal-soft);border:1px solid var(--shoal);border-radius:12px;
+.install{background:var(--shoal-soft);border:2px solid var(--shoal);border-radius:var(--r);
   padding:16px 18px;margin-bottom:14px;position:relative}
 .install h3{font-size:15px;font-weight:600;padding-right:24px;letter-spacing:-.01em}
 .install p{font-size:13px;color:var(--ink-2);margin-top:6px}
@@ -243,7 +302,7 @@ button.stamp:hover{color:var(--chart)}
 
 /* ═══ 지도 ═══ */
 .mapcard{padding-bottom:14px}
-.map{display:block;width:100%;height:auto;border-radius:9px;margin-top:2px}
+.map{display:block;width:100%;height:auto;border-radius:var(--r-sm);margin-top:2px}
 .map a{cursor:pointer}
 .map a circle[fill="var(--chart)"]{transition:r .12s}
 .map a:hover circle[fill="var(--chart)"]{r:9}
@@ -266,11 +325,11 @@ a.geo:hover{color:var(--chart);border-bottom-color:var(--chart)}
 .prog{margin-bottom:16px}
 .prog-l{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;
   font-size:12px;margin-bottom:6px;font-variant-numeric:tabular-nums;color:var(--ink-2)}
-.prog-t{height:6px;background:var(--rule-soft);border-radius:3px;overflow:hidden}
+.prog-t{height:9px;background:var(--rule-soft);border-radius:5px;overflow:hidden}
 .prog-f{height:100%;background:var(--ok);width:0;transition:width .3s}
 .task{display:flex;gap:13px;align-items:flex-start}
-.box{flex:0 0 auto;width:26px;height:26px;margin-top:1px;border:1.5px solid var(--rule);
-  border-radius:7px;background:var(--field);cursor:pointer;padding:0;
+.box{flex:0 0 auto;width:28px;height:28px;margin-top:1px;border:2px solid var(--rule);
+  border-radius:10px;background:var(--field);cursor:pointer;padding:0;
   display:flex;align-items:center;justify-content:center;color:transparent;
   font-size:15px;line-height:1;transition:background .15s,border-color .15s}
 .box:hover{border-color:var(--chart)}
@@ -294,7 +353,7 @@ a.geo:hover{color:var(--chart);border-bottom-color:var(--chart)}
 .done-by{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ok);margin-top:9px}
 .task.is-done .t-name{text-decoration:line-through;text-decoration-color:var(--ink-3);color:var(--ink-3)}
 .task.is-done .t-tag{background:var(--ok-soft);color:var(--ok)}
-.script{margin-top:11px;background:var(--shoal-soft);border-radius:9px;padding:13px 15px;
+.script{margin-top:11px;background:var(--shoal-soft);border-radius:var(--r-sm);padding:13px 15px;
   font-size:13px;line-height:1.7}
 .script .lbl{font-family:"IBM Plex Mono",monospace;font-size:9.5px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:7px}
@@ -306,12 +365,12 @@ a.geo:hover{color:var(--chart);border-bottom-color:var(--chart)}
 .ifield label small{display:block;color:var(--ink-3);font-size:11px;line-height:1.45;font-weight:400}
 .irow{display:flex;align-items:center;gap:6px}
 .irow input{width:100%;min-width:0;background:var(--field);color:var(--ink);
-  border:1px solid var(--rule);border-radius:9px;padding:10px 11px;
+  border:2px solid var(--rule);border-radius:var(--r-sm);padding:10px 11px;
   font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:600;
   font-variant-numeric:tabular-nums;text-align:right}
 .irow input:focus{border-color:var(--chart);background:var(--card)}
 .unit{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3);white-space:nowrap}
-.verdict{border-radius:12px;padding:20px;margin-bottom:14px;
+.verdict{border-radius:var(--r);padding:20px;margin-bottom:14px;
   background:var(--warn-soft);border:1px solid var(--warn)}
 .verdict.ok{background:var(--ok-soft);border-color:var(--ok)}
 .verdict .lbl{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
@@ -324,8 +383,8 @@ a.geo:hover{color:var(--chart);border-bottom-color:var(--chart)}
 .bar-row .bl{display:flex;justify-content:space-between;margin-bottom:5px;
   font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-variant-numeric:tabular-nums}
 .bar-row .bl span:first-child{font-family:"IBM Plex Sans KR",sans-serif;font-size:13px}
-.track{height:22px;background:var(--rule-soft);border-radius:5px;overflow:hidden}
-.fill{height:100%;transition:width .3s}
+.track{height:24px;background:var(--rule-soft);border-radius:12px;overflow:hidden}
+.fill{height:100%;border-radius:12px;transition:width .3s}
 .fill.have{background:var(--shoal)}
 .fill.need{background:var(--chart)}
 .scale{display:flex;justify-content:space-between;margin-top:7px;
@@ -386,7 +445,7 @@ tr.gapr td{border:0;font-weight:600;color:var(--chart)}
 .sub-label{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--ink-3);margin:22px 0 10px}
 .teams{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.team{background:var(--shoal-soft);border-radius:10px;padding:14px}
+.team{background:var(--shoal-soft);border-radius:var(--r-sm);padding:14px}
 .tname{font-size:16px;font-weight:600;margin-bottom:8px}
 .tname span{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3);font-weight:400;margin-left:4px}
 .team ul{margin:0;padding-left:16px;font-size:13px;line-height:1.8}
@@ -415,7 +474,7 @@ tr.gapr td{border:0;font-weight:600;color:var(--chart)}
   text-align:center;border-radius:50%}
 
 /* ═══ 정보 ═══ */
-details{background:var(--card);border-radius:12px;margin-bottom:10px;box-shadow:var(--shadow);
+details{background:var(--card);border-radius:var(--r);margin-bottom:10px;box-shadow:var(--shadow);
   overflow:hidden}
 summary{padding:16px 18px;cursor:pointer;font-size:15px;font-weight:600;
   list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
@@ -463,7 +522,7 @@ details[open] summary{border-bottom:1px solid var(--rule-soft)}
 .who-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
 .who-bar label{color:var(--ink-2);white-space:nowrap}
 .who-bar input{flex:1;min-width:110px;background:var(--field);color:var(--ink);
-  border:1px solid var(--rule);border-radius:9px;padding:9px 11px;font:inherit;font-size:13.5px}
+  border:2px solid var(--rule);border-radius:var(--r-sm);padding:9px 11px;font:inherit;font-size:13.5px}
 .foot{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3);
   text-align:center;padding:22px 0 4px;letter-spacing:.06em}
 
@@ -790,6 +849,12 @@ function mapHTML(i){
 /* 예약처 링크 — 2026-09-07에 전부 접속 확인했습니다.
    [이름, 분류, URL, 메모] */
 var LINKS = [
+  ["한국어", "이시가키섬 투어즈 (한국어)", "https://ishigaki-tours.com/ko/", "환상의 섬·만타 둘 다 취급 · 사이트 전체가 한국어"],
+  ["한국어", "이시가키섬 투어즈 — 단체", "https://ishigaki-tours.com/ko/group-travel/", "14명 단체 문의는 여기부터"],
+  ["한국어", "이시가키섬 투어즈 — 문의", "https://ishigaki-tours.com/ko/select-contact/", "공식 라인으로 상담 · 8:00~17:00"],
+  ["한국어", "마이리얼트립 — 환상의 섬", "https://experiences.myrealtrip.com/products/4896100", "현지 한국어 가이드 · 카톡 연락 · 사진 데이터 포함. 판매 중지될 때가 있음"],
+  ["한국어", "와그 — 환상의 섬 + SUP", "https://www.waug.com/ko/activities/146929", "한국 결제 그대로"],
+  ["한국어", "타비라이 한국어 — 만타", "https://ko.tabirai-japan.com/activity/okinawa/manta/", "만타 투어 비교"],
   ["투어", "럭키클로버", "https://luckyclover-ishigaki.com/", "환상의 섬 9/16 · 전세 문의처"],
   ["투어", "라이즈 이시가키", "https://www.rise-ishigaki.com/", "만타 후보 · 고프로 무료 대여"],
   ["투어", "라이즈 — 만타 안내", "https://www.rise-ishigaki.com/column-manta", "조우율·시즌·요금 상세"],

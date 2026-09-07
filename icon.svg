@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="이시가키 항해도">
-  <rect width="512" height="512" rx="112" fill="#0F2028"/>
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#CFE6EC" stroke-width="14" opacity=".45"/>
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#D10A6E" stroke-width="14"
-          stroke-dasharray="236 707" stroke-dashoffset="-59" stroke-linecap="round"/>
-  <path d="M256 150 L300 300 L256 272 L212 300 Z" fill="#D10A6E"/>
-  <circle cx="256" cy="256" r="16" fill="#0F2028"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="이시가키">
+  <rect width="512" height="512" rx="112" fill="#3FC2BA"/>
+  <path d="M0 300c40-26 80 26 120 0s80-26 120 0 80 26 120 0 80-26 120 0v212H0z" fill="#7FE0D8" opacity=".55"/>
+  <path d="M0 352c40-26 80 26 120 0s80-26 120 0 80 26 120 0 80-26 120 0v160H0z" fill="#FFF8EE"/>
+  <circle cx="256" cy="196" r="74" fill="#FFF8EE"/>
+  <path d="M256 148c26 0 46 20 46 44 0 30-46 62-46 62s-46-32-46-62c0-24 20-44 46-44z" fill="#E0457E"/>
+  <circle cx="256" cy="190" r="15" fill="#FFF8EE"/>
 </svg>

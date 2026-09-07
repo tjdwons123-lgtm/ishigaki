@@ -5,76 +5,78 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>이시가키 검수</title>
 <meta name="description" content="새로 제안된 일정안을 검토하고 채택하면 메인 앱에 반영됩니다">
-<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#081820" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#7FE0D8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1E7F7A" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="../icon-180.png">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&display=swap">
 <style>
 :root{
-  --deep:#FFFFFF; --sheet:#F2F6F7; --shoal:#CFE6EC; --shoal-soft:#E6F1F4;
-  --ink:#0F2028; --ink-2:#3B535E; --ink-3:#6E838C;
-  --rule:#C3D2D6; --rule-soft:#DDE6E8;
-  --chart:#D10A6E; --chart-soft:#FDE8F1;
-  --warn:#B45309; --warn-soft:#FBEFDC;
-  --ok:#12695A; --ok-soft:#DDEFEA;
-  --card:#FFFFFF; --field:#F4F7F8; --bar:#FFFFFFEE;
-  --shadow:0 1px 3px rgba(15,32,40,.07);
+  --deep:#FFFFFF; --sheet:#FFF8EE; --shoal:#A9E6E1; --shoal-soft:#E0F6F3;
+  --lagoon:#3FC2BA;
+  --ink:#2C4A52; --ink-2:#557179; --ink-3:#8AA3A9;
+  --rule:#D6E4E2; --rule-soft:#EAF2F0;
+  --chart:#E0457E; --chart-soft:#FDE6EF;
+  --warn:#C2621F; --warn-soft:#FDEEDF;
+  --ok:#12897A; --ok-soft:#DBF2EE;
+  --card:#FFFFFF; --field:#F5FAF9; --bar:#FFFDF9F2;
+  --shadow:0 2px 8px rgba(44,74,82,.07);
   color-scheme:light dark;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --deep:#081820; --sheet:#0B1E27; --shoal:#123A47; --shoal-soft:#0F2E39;
-  --ink:#E4EDF0; --ink-2:#A9BEC6; --ink-3:#7A939C;
-  --rule:#22434F; --rule-soft:#173039;
-  --chart:#FF5CA6; --chart-soft:#33101F;
-  --warn:#E9A63F; --warn-soft:#33260F;
-  --ok:#5CC9B0; --ok-soft:#0E2E2A;
-  --card:#0D2531; --field:#0A2029; --bar:#081820EE;
-  --shadow:0 1px 3px rgba(0,0,0,.45);
+  --deep:#0B1F26; --sheet:#0E2229; --shoal:#1D5C5A; --shoal-soft:#123A3B; --lagoon:#4FD3C9;
+  --ink:#E6F2F0; --ink-2:#AFC8C7; --ink-3:#7D9B9C;
+  --rule:#254449; --rule-soft:#173236;
+  --chart:#FF7FB0; --chart-soft:#3A1223;
+  --warn:#EFA059; --warn-soft:#33240F;
+  --ok:#57D2BE; --ok-soft:#0E332E;
+  --card:#132D34; --field:#102830; --bar:#0E2229F2;
+  --shadow:0 2px 8px rgba(0,0,0,.4);
 }}
 :root[data-theme="dark"]{
-  --deep:#081820; --sheet:#0B1E27; --shoal:#123A47; --shoal-soft:#0F2E39;
-  --ink:#E4EDF0; --ink-2:#A9BEC6; --ink-3:#7A939C;
-  --rule:#22434F; --rule-soft:#173039; --chart:#FF5CA6; --chart-soft:#33101F;
-  --warn:#E9A63F; --warn-soft:#33260F; --ok:#5CC9B0; --ok-soft:#0E2E2A;
-  --card:#0D2531; --field:#0A2029; --bar:#081820EE;
-  --shadow:0 1px 3px rgba(0,0,0,.45);
+  --deep:#0B1F26; --sheet:#0E2229; --shoal:#1D5C5A; --shoal-soft:#123A3B; --lagoon:#4FD3C9;
+  --ink:#E6F2F0; --ink-2:#AFC8C7; --ink-3:#7D9B9C;
+  --rule:#254449; --rule-soft:#173236; --chart:#FF7FB0; --chart-soft:#3A1223;
+  --warn:#EFA059; --warn-soft:#33240F; --ok:#57D2BE; --ok-soft:#0E332E;
+  --card:#132D34; --field:#102830; --bar:#0E2229F2;
+  --shadow:0 2px 8px rgba(0,0,0,.4);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
 html,body{height:100%}
-body{margin:0;background:var(--sheet);color:var(--ink);line-height:1.65;
+body{margin:0;background:var(--sheet);
+  background-image:radial-gradient(circle at 1px 1px, rgba(63,194,186,.10) 1px, transparent 0);background-size:22px 22px;color:var(--ink);line-height:1.65;
   font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;overflow:hidden}
 h1,h2,h3,h4,p{margin:0}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--chart);outline-offset:2px}
 
-.appbar{flex:0 0 auto;background:var(--bar);backdrop-filter:saturate(180%) blur(12px);
-  border-bottom:1px solid var(--rule-soft);
+.appbar{flex:0 0 auto;background:linear-gradient(180deg,#7FE0D8,#3FC2BA);color:#083B3F;
+  border-bottom:0;
   padding:calc(env(safe-area-inset-top) + 12px) 20px 12px;
   display:flex;align-items:center;justify-content:space-between;gap:12px}
-.back{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--ink);
+.back{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:inherit;
   font-size:14px;font-weight:500}
-.back span.a{font-family:"IBM Plex Mono",monospace;color:var(--chart);font-size:16px}
+.back span.a{font-family:"IBM Plex Mono",monospace;color:inherit;font-size:16px}
 .count{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
-  background:var(--ink);color:var(--deep);padding:5px 11px;border-radius:100px;white-space:nowrap}
-.count.some{background:var(--ok)}
+  background:#fff;color:var(--chart);padding:5px 11px;border-radius:100px;white-space:nowrap}
+.count.some{color:var(--ok)}
 
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .wrap{max-width:640px;margin:0 auto;padding:22px 20px calc(env(safe-area-inset-bottom) + 40px)}
 
-.lede h1{font-family:"Gowun Batang",serif;font-size:26px;font-weight:700;line-height:1.3}
+.lede h1{font-family:"Jua",sans-serif;font-size:26px;font-weight:700;line-height:1.3}
 .lede p{color:var(--ink-2);font-size:14px;margin-top:8px}
-.howto{background:var(--shoal-soft);border-radius:10px;padding:14px 16px;margin:16px 0 26px;
+.howto{background:var(--shoal-soft);border-radius:14px;padding:14px 16px;margin:16px 0 26px;
   font-size:13px;color:var(--ink-2)}
 .howto b{color:var(--ink)}
 
 .grp{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
   text-transform:uppercase;color:var(--ink-3);margin:30px 0 10px}
-.p{background:var(--card);border-radius:12px;box-shadow:var(--shadow);margin-bottom:14px;
+.p{background:var(--card);border-radius:18px;box-shadow:var(--shadow);margin-bottom:14px;
   overflow:hidden;border:1px solid transparent}
 .p.on{border-color:var(--ok)}
 .p-head{padding:18px 18px 0}
@@ -108,7 +110,7 @@ button{font:inherit;color:inherit}
 .exc{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--warn);
   padding:0 18px 14px;margin-top:-6px}
 
-.summary{background:var(--card);border-radius:12px;box-shadow:var(--shadow);
+.summary{background:var(--card);border-radius:18px;box-shadow:var(--shadow);
   padding:18px;margin-top:30px}
 .summary h3{font-size:16px;font-weight:600;margin-bottom:12px}
 .srow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;
@@ -120,7 +122,7 @@ button{font:inherit;color:inherit}
 .empty{font-size:13px;color:var(--ink-3);padding:6px 0}
 .go{display:flex;align-items:center;justify-content:space-between;gap:12px;
   width:100%;margin-top:16px;background:var(--ink);color:var(--deep);border:0;
-  border-radius:10px;padding:15px 18px;cursor:pointer;text-decoration:none}
+  border-radius:14px;padding:15px 18px;cursor:pointer;text-decoration:none}
 .go b{font-size:14.5px}
 .go small{display:block;opacity:.7;font-size:12px;font-weight:400}
 .go .a{font-family:"IBM Plex Mono",monospace;font-size:16px}
