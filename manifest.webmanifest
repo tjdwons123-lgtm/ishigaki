@@ -1,6 +1,6 @@
 {
-  "name": "이시가키 항해도",
-  "short_name": "이시가키",
+  "name": "DDIP 이시가키 일지",
+  "short_name": "DDIP 이시가키",
   "description": "2026.09.13-17 이시가키 14인 여행 · 일정, 예약 체크리스트, 공금 계산기",
   "start_url": "./",
   "scope": "./",

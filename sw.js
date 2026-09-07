@@ -2,7 +2,7 @@
    현지에서 데이터가 없어도 열리게 합니다.
    내용을 고쳐서 다시 올릴 때는 아래 VERSION 숫자만 올리세요. */
 
-var VERSION = "v11";
+var VERSION = "v12";
 var SHELL = "isg-shell-" + VERSION;
 var RUNTIME = "isg-runtime-" + VERSION;
 
