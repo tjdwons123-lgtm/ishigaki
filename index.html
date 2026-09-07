@@ -368,6 +368,18 @@ tr.gapr td{border:0;font-weight:600;color:var(--chart)}
 .t-tag.alt{background:var(--rule-soft);color:var(--ink-3)}
 .btn.tiny{margin-top:8px;padding:6px 12px;font-size:12.5px}
 
+/* ═══ 예약처 링크 ═══ */
+.link-row{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--rule-soft);text-decoration:none;color:inherit}
+.link-row:last-of-type{border-bottom:0}
+.link-row:hover b{color:var(--chart)}
+.lr-b{min-width:0;flex:1}
+.lr-b b{font-size:14px;font-weight:600;display:block}
+.lr-b small{display:block;color:var(--ink-3);font-size:12.5px;margin-top:1px}
+.lr-u{display:block;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  color:var(--ink-3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.link-row .arw{font-family:"IBM Plex Mono",monospace;color:var(--chart);font-size:14px;flex:0 0 auto}
+
 /* ═══ 조 편성 ═══ */
 .tlede{font-size:13px;color:var(--ink-2);margin-bottom:14px;line-height:1.65}
 .tlede b{color:var(--ink);font-weight:600}
@@ -775,16 +787,38 @@ function mapHTML(i){
     '<span class="mapnote">' + esc(ROUTE_NOTE[i]) + '</span></div></div>';
 }
 
+/* 예약처 링크 — 2026-09-07에 전부 접속 확인했습니다.
+   [이름, 분류, URL, 메모] */
+var LINKS = [
+  ["투어", "럭키클로버", "https://luckyclover-ishigaki.com/", "환상의 섬 9/16 · 전세 문의처"],
+  ["투어", "라이즈 이시가키", "https://www.rise-ishigaki.com/", "만타 후보 · 고프로 무료 대여"],
+  ["투어", "라이즈 — 만타 안내", "https://www.rise-ishigaki.com/column-manta", "조우율·시즌·요금 상세"],
+  ["투어", "SeaChan", "https://seachan-ishigakijima.com/", "스노클링 대안 업체"],
+  ["투어", "가비라 마린서비스", "http://www.kabiramarine.jp/", "가비라만 글라스보트"],
+  ["투어", "마린하우스 구루쿤", "https://gurukun-kabira.com/", "가비라만 글라스보트 대안"],
+  ["배편", "안에이관광 — 승선권 예약", "https://aneikankou.co.jp/reservation", "다케토미 9/15 · 7명씩 2건"],
+  ["배편", "안에이관광 — 운항상황", "https://aneikankou.co.jp/condition", "매일 아침 확인"],
+  ["배편", "야에야마관광페리", "https://www.yaeyama.co.jp/josen.html", "안에이가 만석일 때 대안"],
+  ["식당", "기타우치 목장 하마사키 본점", "https://krs-beef.jp/hamasaki/", "야키니쿠 9/14 20:00"],
+  ["식당", "우사기야 이시가키 본점", "https://usagiya-ishigaki.com/", "9/16 21시 라이브 회차"],
+  ["식당", "후나쿠라노사토", "https://funakuranosato.com/", "층 단위 전세 · 산신 공연"],
+  ["식당", "이시가키규 마루", "https://ishigaki-maru.com/", "야키니쿠 대안 · 넷 예약"],
+  ["구경", "이시가키 야이마무라", "https://www.yaimamura.com/", "리스자루노모리 · 09:00~17:30"]
+];
+
 var TASKS = [
   { id:"lucky", name:"럭키클로버 — 보트 전세", tag:"가장 급함", tel:"090-6777-9220",
+    site:"https://luckyclover-ishigaki.com/",
     why:"9/14 오전 반나절 · 98,000엔 · 38인승 전세. 9월 성수기에 배를 통째로 빌리는 건이라 D-7이면 이미 늦은 편입니다. <b>5명 이상 단체는 무료 취소 기한이 이틀 전</b>이라, 예약을 걸어도 9/12 정오까지 태풍 판단이 가능합니다 — 지금 거는 게 손해 볼 일이 없다는 뜻입니다. 07:00–20:00.",
     jp:"9月14日の午前、14名で貸切をお願いしたいです。幻の島とシュノーケルの半日コースです。空いていますか。",
     ko:"9월 14일 오전, 14명 전세로 환상의 섬 + 스노클링 반나절 가능한가요. — 이어서 ① 출항·귀항 시각 ② 점심 포함 여부 ③ 시라호 숙소 송영 ④ 결제 방법 ⑤ 장비·구명조끼 포함 여부를 확인하세요." },
   { id:"kitauchi", name:"기타우치 목장 — 야키니쿠", tag:"금액 미확인", tel:"0980-83-7000",
+    site:"https://krs-beef.jp/hamasaki/",
     why:"9/14 저녁 14명. 120석이라 자리는 거의 확실합니다. 문제는 <b>1인 단가를 모른다는 것</b> — 통화되면 바로 예산 탭에 넣으세요. 디너 16:30–22:00 (L.O. 21:30).",
     jp:"9月14日の夜、14名で予約したいです。18時半頃、一つのテーブルにまとまって座れますか。コースはおいくらですか。",
     ko:"9월 14일 저녁 18:30, 14명 한자리 가능한가요. 코스 가격은 얼마인가요. — 이어서 ① 코스 필수 여부 ② 음료 무제한 유무와 가격 ③ 카드 결제 ④ 주차 2대를 확인하세요." },
   { id:"usagiya", name:"우사기야 — 마지막 밤", tag:"17시부터", tel:"0980-88-5014",
+    site:"https://usagiya-ishigaki.com/",
     why:"9/16 저녁 14명 · 좌식 40명 · 코스 4,000엔~. 섬 노래 라이브가 19:00·21:00 두 번 있어 마지막 밤에 맞습니다. <b>19시 라이브를 보려면 18:00 입장</b>으로 잡으세요. 영업이 17:00 시작이라 오후 5시 이후에 걸어야 합니다.",
     jp:"9月16日、14名で18時から予約できますか。19時の島唄ライブを見たいです。座敷でお願いします。",
     ko:"9월 16일 18시, 14명 좌식 예약 가능한가요. 19시 라이브를 보고 싶습니다. — 코스 가격, 음료 무제한 포함 여부, 카드 결제, 주차 2대(총 5대뿐)를 확인하세요." },
@@ -1017,10 +1051,11 @@ function renderTodo(){
       '<button class="box" type="button" aria-pressed="' + done + '" aria-label="' + esc(t.name) + ' 완료 표시">✓</button>' +
       '<div class="t-body"><div class="t-top"><span class="t-name">' + esc(t.name) + '</span>' +
       '<span class="t-tag">' + (done ? "완료" : esc(t.tag)) + '</span></div>';
-    if (t.tel || t.link) {
+    if (t.tel || t.link || t.site) {
       h += '<div class="calls">';
       if (t.tel)  h += '<a class="btn" href="tel:' + t.tel.replace(/-/g,"") + '">📞 ' + t.tel + '</a>';
       if (t.link) h += '<a class="btn ghost" href="' + t.link + '" target="_blank" rel="noopener">' + esc(t.linkLabel) + '</a>';
+      if (t.site) h += '<a class="btn ghost" href="' + t.site + '" target="_blank" rel="noopener">홈페이지</a>';
       h += '</div>';
     }
     h += '<p class="t-why">' + t.why + '</p>';
@@ -1162,12 +1197,12 @@ var MEALS_BY_DAY = [
 
 /* 14명 단체석 — 좌석 수가 확인된 순서 */
 var GROUP_REST = [
-  ["기타우치 목장 하마사키 본점","야키니쿠","120석","전세는 50명부터라 14명은 일반 예약. 런치 11:30~14:30 · 디너 16:30~22:00 (L.O. 21:30)","石垣島きたうち牧場 浜崎本店","0980-83-7000",1],
-  ["우사기야 이시가키 본점","향토요리 + 라이브","총 60석 · 좌식 40명","17:00~23:00 · 주차 5대 · 코스 4,000엔~. 섬 노래 라이브 19시·21시. 전세는 안 됩니다","うさぎや 石垣本店","0980-88-5014",1],
+  ["기타우치 목장 하마사키 본점","야키니쿠","120석","전세는 50명부터라 14명은 일반 예약. 런치 11:30~14:30 · 디너 16:30~22:00 (L.O. 21:30)","石垣島きたうち牧場 浜崎本店","0980-83-7000",1,"https://krs-beef.jp/hamasaki/"],
+  ["우사기야 이시가키 본점","향토요리 + 라이브","총 60석 · 좌식 40명","17:00~23:00 · 주차 5대 · 코스 4,000엔~. 섬 노래 라이브 19시·21시. 전세는 안 됩니다","うさぎや 石垣本店","0980-88-5014",1,"https://usagiya-ishigaki.com/"],
   ["에라코큐 미사키초점","해산물 이자카야","총 100석 · 반개실 34명","17:00~24:00 (금·토 새벽 1시) · 코스 4,500/5,000/5,500엔 전부 2시간 반 음료 무제한","海鮮居酒屋 鰓呼吸 美崎町店","050-5486-7107",0],
-  ["후나쿠라노사토","야에야마 향토요리 + 공연","층 단위 전세","11:00~22:00 · 주차 있음 · 매일 밤 산신 공연. 옛 붉은기와 집","舟蔵の里","0980-82-8108",0],
+  ["후나쿠라노사토","야에야마 향토요리 + 공연","층 단위 전세","11:00~22:00 · 주차 있음 · 매일 밤 산신 공연. 옛 붉은기와 집","舟蔵の里","0980-82-8108",0,"https://funakuranosato.com/"],
   ["우미ん추 이자카야 겐","이자카야","총 50석 · 좌식 24명","16:00~23:00 · 코스 2,500엔~, 음료 무제한 4,000엔~ · 주차 없음","海人居酒屋 源 美崎店","0980-82-8007",0],
-  ["이시가키규 마루","야키니쿠","좌석 미공개","16:00~22:30 (L.O. 21:30) · 라인·넷 예약 · 14명 가능한지 물어봐야 합니다","石垣牛 まる","050-1722-5409",0]
+  ["이시가키규 마루","야키니쿠","좌석 미공개","16:00~22:30 (L.O. 21:30) · 라인·넷 예약 · 14명 가능한지 물어봐야 합니다","石垣牛 まる","050-1722-5409",0,"https://ishigaki-maru.com/"]
 ];
 
 /* 점심 — 예약 없이 가는 곳. 휴무일이 제각각이라 그것만 맞추면 됩니다 */
@@ -1218,6 +1253,7 @@ function renderFood(){
       '<p class="t-why">' + esc(r[3]) + '</p><div class="calls">' +
       '<a class="btn" href="tel:' + r[5].replace(/-/g,"") + '">📞 ' + r[5] + '</a>' +
       '<a class="btn ghost" href="' + gmap(r[4]) + '" target="_blank" rel="noopener">지도</a>' +
+      (r[7] ? '<a class="btn ghost" href="' + r[7] + '" target="_blank" rel="noopener">홈페이지</a>' : '') +
       '</div></div>';
   });
   h += '<p class="note"><b>石垣庵은 후보에서 빼세요</b> — 66석이지만 연회 착석이 10명까지라 14명이 안 들어갑니다. ' +
@@ -1333,6 +1369,19 @@ function renderInfo(){
       return '<li class="' + (done ? "ok" : "") + '">' + (done ? "✓ " : "· ") + esc(t.name) +
         (t.tel ? ' <a class="tinytel" href="tel:' + t.tel.replace(/-/g,"") + '">' + t.tel + '</a>' : '') + '</li>';
     }).join("") + '</ul></div></details>';
+  var lastCat = "";
+  h += '<details open><summary>예약처 · 홈페이지 ' + LINKS.length + '곳</summary><div class="dbody">' +
+    '<p class="tlede">2026-09-07에 전부 접속을 확인했습니다. 누르면 새 창으로 열립니다.</p>';
+  LINKS.forEach(function(L){
+    if (L[0] !== lastCat) { h += '<div class="sub-label">' + esc(L[0]) + '</div>'; lastCat = L[0]; }
+    h += '<a class="link-row" href="' + L[2] + '" target="_blank" rel="noopener">' +
+      '<span class="lr-b"><b>' + esc(L[1]) + '</b><small>' + esc(L[3]) + '</small>' +
+      '<span class="lr-u">' + esc(L[2].replace(/^https?:\/\//,"").replace(/\/$/,"")) + '</span></span>' +
+      '<span class="arw">↗</span></a>';
+  });
+  h += '<p class="note">현지에서 데이터가 없으면 이 링크들은 안 열립니다. ' +
+       '<b>전화번호는 출발 전에 폰 연락처에 저장해두세요</b> — 앱이 못 열려도 전화는 됩니다.</p></div></details>';
+
   h += '<details><summary>각자 챙길 것 · 12</summary><div class="dbody"><div class="kit">' +
     KIT.map(function(k){ return '<div>' + esc(k[0]) + '<small>' + esc(k[1]) + '</small></div>'; }).join("") +
     '</div></div></details>';
