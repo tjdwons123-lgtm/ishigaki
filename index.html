@@ -167,7 +167,7 @@ button{font:inherit;color:inherit}
 .view{padding:20px 20px 32px;max-width:640px;margin:0 auto}
 
 .tabbar{
-  flex:0 0 auto;display:grid;grid-template-columns:repeat(6,1fr);
+  flex:0 0 auto;display:grid;grid-template-columns:repeat(5,1fr);
   background:var(--bar);backdrop-filter:saturate(180%) blur(12px);
   border-top:1px solid var(--rule-soft);
   padding-bottom:env(safe-area-inset-bottom);
@@ -304,9 +304,36 @@ button.stamp:hover{color:var(--chart)}
 .mapcard{padding-bottom:14px}
 .map{display:block;width:100%;height:auto;border-radius:var(--r-sm);margin-top:2px}
 .map a{cursor:pointer}
-.map a circle[fill="var(--chart)"]{transition:r .12s}
-.map a:hover circle[fill="var(--chart)"]{r:9}
 .map a:focus-visible{outline:2px solid var(--chart);outline-offset:2px}
+
+/* 경로가 순서대로 그려집니다 */
+.map .leg{
+  stroke-dasharray:var(--len);stroke-dashoffset:var(--len);
+  animation:draw .55s ease-out forwards;animation-delay:var(--d);
+}
+.map .leg.boat{stroke-dasharray:6 5;stroke-dashoffset:0;opacity:0;
+  animation:fadein .5s ease-out forwards;animation-delay:var(--d)}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fadein{to{opacity:1}}
+
+/* 핀이 통통 떠오릅니다 */
+.map .pin g{
+  opacity:0;transform:scale(.4);
+  animation:pop .42s cubic-bezier(.34,1.56,.64,1) forwards;animation-delay:var(--pd);
+}
+@keyframes pop{to{opacity:1;transform:scale(1)}}
+.map .pin:hover g{transform:scale(1.15)}
+.map .pin g{transition:transform .15s}
+.map .halo{animation:pulse 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%,100%{r:8;opacity:.28}50%{r:13;opacity:0}}
+.map .boaty{opacity:.9}
+
+@media (prefers-reduced-motion:reduce){
+  .map .leg,.map .leg.boat{animation:none;stroke-dashoffset:0;opacity:1}
+  .map .pin g{animation:none;opacity:1;transform:none}
+  .map .halo{animation:none}
+  .map .boaty animateMotion{display:none}
+}
 .maplegend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:10px;
   font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3)}
 .maplegend span{display:flex;align-items:center;gap:5px}
@@ -473,6 +500,30 @@ tr.gapr td{border:0;font-weight:600;color:var(--chart)}
   border:1px solid var(--chart);width:19px;height:19px;line-height:17px;
   text-align:center;border-radius:50%}
 
+/* ═══ 1인당 지출 ═══ */
+.verdict.big{background:linear-gradient(160deg,var(--shoal-soft),var(--card));
+  border:2px solid var(--shoal);position:relative;overflow:hidden}
+.verdict.big::after{content:"";position:absolute;right:-24px;bottom:-34px;width:120px;height:120px;
+  border-radius:50%;background:var(--shoal);opacity:.35}
+.verdict.big > *{position:relative}
+.verdict.big .amt{font-size:40px;color:var(--ink)}
+.verdict.big .per{font-size:17px;color:var(--chart)}
+.cats{display:flex;flex-direction:column;gap:16px}
+.cat-l{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px}
+.cat-l span{font-size:14px;font-weight:600}
+.cat-l b{font-family:"IBM Plex Mono",monospace;font-size:13.5px;font-variant-numeric:tabular-nums}
+.cat-t{height:12px;background:var(--rule-soft);border-radius:6px;overflow:hidden}
+.cat-f{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--lagoon),var(--shoal));
+  transition:width .4s ease-out}
+.cat:nth-child(2) .cat-f{background:linear-gradient(90deg,var(--kawara),#F0A883)}
+.cat:nth-child(3) .cat-f{background:linear-gradient(90deg,#6FA8D6,#A9CDEA)}
+.cat:nth-child(4) .cat-f{background:linear-gradient(90deg,var(--chart),#F5A0C2)}
+.cat small{display:block;color:var(--ink-3);font-size:12px;margin-top:5px}
+.cash p{font-size:13.5px;color:var(--ink-2);line-height:1.7}
+.cash p b{color:var(--ink)}
+.fine{font-size:12px;color:var(--ink-3);line-height:1.6;margin-top:14px}
+.fine b{color:var(--ink-2)}
+
 /* ═══ 정보 ═══ */
 details{background:var(--card);border-radius:var(--r);margin-bottom:10px;box-shadow:var(--shadow);
   overflow:hidden}
@@ -539,7 +590,6 @@ details[open] summary{border-bottom:1px solid var(--rule-soft)}
   <div class="view" id="v-today"></div>
   <div class="view" id="v-plan" hidden></div>
   <div class="view" id="v-food" hidden></div>
-  <div class="view" id="v-todo" hidden></div>
   <div class="view" id="v-money" hidden></div>
   <div class="view" id="v-info" hidden></div>
 </div>
@@ -551,8 +601,6 @@ details[open] summary{border-bottom:1px solid var(--rule-soft)}
     <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>일정</button>
   <button class="tab" role="tab" data-v="food" aria-selected="false">
     <svg viewBox="0 0 24 24"><path d="M6 3v8a2 2 0 0 0 4 0V3M8 11v10M15 3c-1.2 1.5-1.5 3-1.5 5s.5 3 1.8 3H18V3z"/><path d="M18 11v10"/></svg>음식</button>
-  <button class="tab" role="tab" data-v="todo" aria-selected="false">
-    <svg viewBox="0 0 24 24"><path d="M4 7.5l2.5 2.5L11 5M4 17l2.5 2.5L11 14.5M14 8h6M14 18h6"/></svg>할일</button>
   <button class="tab" role="tab" data-v="money" aria-selected="false">
     <svg viewBox="0 0 24 24"><path d="M7 5l5 7 5-7M12 12v7M8.5 13.5h7M8.5 16.5h7"/></svg>예산</button>
   <button class="tab" role="tab" data-v="info" aria-selected="false">
@@ -725,11 +773,11 @@ var GEO = {
   maxvalu:   [24.349, 124.174, "맥스밸류", "r", "マックスバリュやいま店"],
   kabira:    [24.453, 124.145, "가비라만", "l", "川平湾"],
   tamatori:  [24.474, 124.247, "다마토리자키", "r", "玉取崎展望台"],
-  hirakubo:  [24.598, 124.307, "히라쿠보자키", "l", "平久保崎灯台"],
+  hirakubo:  [24.583, 124.301, "히라쿠보자키", "l", "平久保崎灯台"],
   yonehara:  [24.466, 124.178, "요네하라", "t", "米原ビーチ"],
   sunset:    [24.552, 124.280, "선셋비치", "l", "石垣島サンセットビーチ"],
   ugan:      [24.437, 124.073, "우간자키", "b", "御神崎"],
-  manta:     [24.470, 124.128, "만타 포인트", "l", "川平石崎マンタスクランブル"],
+  manta:     [24.478, 124.103, "만타 포인트", "l", "川平石崎マンタスクランブル"],
   yaima:     [24.394, 124.128, "야이마무라", "l", "石垣やいま村"],
   taketomi:  [24.331, 124.093, "다케토미섬", "l", "竹富島"],
   maboroshi: [24.352, 124.057, "환상의 섬", "l", "24.3517,124.0567"]
@@ -744,9 +792,9 @@ function gmap(q){
 /* 이시가키 본섬 해안선 — 시계방향, 남서쪽 후사키에서 시작 */
 var COAST = [
   [24.328,124.112],[24.372,124.092],[24.437,124.072],[24.462,124.130],
-  [24.489,124.176],[24.481,124.230],[24.525,124.258],[24.599,124.308],
-  [24.575,124.316],[24.520,124.270],[24.487,124.242],[24.472,124.250],
-  [24.428,124.244],[24.368,124.226],[24.350,124.198],[24.334,124.176],
+  [24.489,124.176],[24.481,124.230],[24.518,124.250],[24.599,124.308],
+  [24.572,124.322],[24.520,124.272],[24.487,124.242],[24.472,124.250],
+  [24.428,124.244],[24.401,124.256],[24.368,124.226],[24.350,124.198],[24.334,124.176],
   [24.330,124.152],[24.327,124.130]
 ];
 var ISLES = [[24.331,124.093,0.016],[24.352,124.057,0.005]];
@@ -785,14 +833,37 @@ function mapHTML(i){
   var s = '<svg viewBox="-16 -14 288 344" class="map" role="img" aria-label="' +
           (i+1) + '일차 이동 경로 개념도">';
 
-  /* 바다 · 육지 */
-  s += '<rect x="-16" y="-14" width="288" height="344" fill="var(--sea)"/>';
+  /* 바다 — 잔물결과 산호초 */
+  s += '<defs>' +
+    '<pattern id="ripple" width="26" height="16" patternUnits="userSpaceOnUse">' +
+      '<path d="M0 8q6.5-5 13 0t13 0" fill="none" stroke="var(--lagoon)" stroke-width="1" opacity=".22"/>' +
+    '</pattern>' +
+    '<radialGradient id="lag" cx="50%" cy="45%" r="70%">' +
+      '<stop offset="0%" stop-color="var(--sea)"/><stop offset="100%" stop-color="var(--shoal)"/>' +
+    '</radialGradient></defs>';
+  s += '<rect x="-16" y="-14" width="288" height="344" fill="url(#lag)"/>';
+  s += '<rect x="-16" y="-14" width="288" height="344" fill="url(#ripple)"/>';
+
+  /* 산호초 — 해안선을 살짝 부풀린 점선 */
+  var reef = COAST.map(function(p){
+    var x = PX(p[1]), y = PY(p[0]);
+    var cx = 128, cy = 165;
+    return (x + (x - cx) * 0.06).toFixed(1) + " " + (y + (y - cy) * 0.06).toFixed(1);
+  }).join("L");
+  s += '<path d="M' + reef + 'Z" fill="none" stroke="var(--lagoon)" stroke-width="1.4" ' +
+       'stroke-dasharray="3 4" opacity=".5"/>';
+
+  /* 육지 */
   s += '<path d="M' + COAST.map(function(p){ return PX(p[1]).toFixed(1) + " " + PY(p[0]).toFixed(1); }).join("L") +
-       'Z" fill="var(--isle)" stroke="var(--rule)" stroke-width="1.2" stroke-linejoin="round"/>';
+       'Z" fill="var(--isle)" stroke="var(--kawara)" stroke-width="1.6" stroke-linejoin="round" opacity=".95"/>';
   ISLES.forEach(function(o){
     s += '<circle cx="' + PX(o[1]).toFixed(1) + '" cy="' + PY(o[0]).toFixed(1) +
-         '" r="' + (o[2] * 1000).toFixed(1) + '" fill="var(--isle)" stroke="var(--rule)" stroke-width="1.2"/>';
+         '" r="' + (o[2] * 1000 + 3).toFixed(1) + '" fill="none" stroke="var(--lagoon)" ' +
+         'stroke-width="1.2" stroke-dasharray="3 4" opacity=".5"/>';
+    s += '<circle cx="' + PX(o[1]).toFixed(1) + '" cy="' + PY(o[0]).toFixed(1) +
+         '" r="' + (o[2] * 1000).toFixed(1) + '" fill="var(--isle)" stroke="var(--kawara)" stroke-width="1.4"/>';
   });
+
 
   /* 안 가는 곳은 흐리게 */
   Object.keys(GEO).forEach(function(k){
@@ -802,13 +873,24 @@ function mapHTML(i){
          '" r="2.4" fill="var(--ink-3)" opacity=".4"/>';
   });
 
-  /* 경로 */
-  legs.forEach(function(l){
+  /* 경로 — 순서대로 그려집니다 */
+  var acc = 0;
+  legs.forEach(function(l, n){
     var a = GEO[l[0]], b = GEO[l[1]];
-    s += '<line x1="' + PX(a[1]).toFixed(1) + '" y1="' + PY(a[0]).toFixed(1) +
-         '" x2="' + PX(b[1]).toFixed(1) + '" y2="' + PY(b[0]).toFixed(1) +
-         '" stroke="var(--chart)" stroke-width="2.2" stroke-linecap="round"' +
-         (l[2] === "boat" ? ' stroke-dasharray="5 5"' : '') + '/>';
+    var x1 = PX(a[1]), y1 = PY(a[0]), x2 = PX(b[1]), y2 = PY(b[0]);
+    var len = Math.hypot(x2 - x1, y2 - y1);
+    var boat = l[2] === "boat";
+    s += '<line class="leg' + (boat ? " boat" : "") + '" x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) +
+         '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) +
+         '" stroke="' + (boat ? "var(--lagoon)" : "var(--chart)") + '" stroke-width="2.4" stroke-linecap="round"' +
+         ' style="--len:' + len.toFixed(1) + ';--d:' + (acc / 260).toFixed(2) + 's"/>';
+    acc += len;
+    if (boat) {
+      /* 뱃길 위를 오가는 작은 배 */
+      s += '<circle class="boaty" r="3.2" fill="var(--card)" stroke="var(--lagoon)" stroke-width="1.6">' +
+           '<animateMotion dur="3.4s" repeatCount="indefinite" path="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) +
+           'L' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '"/></circle>';
+    }
   });
 
   /* 들르는 곳 — 번호와 이름. 누르면 구글맵으로 */
@@ -821,14 +903,18 @@ function mapHTML(i){
     else { ty = y + 18; }
 
     s += '<a href="' + gmap(g[4]) + '" target="_blank" rel="noopener" class="pin" aria-label="' +
-         esc(g[2]) + ' 구글지도로 열기">';
+         esc(g[2]) + ' 구글지도로 열기" style="--pd:' + (0.28 + n * 0.13).toFixed(2) + 's">';
+    s += '<g style="transform-origin:' + x.toFixed(1) + 'px ' + y.toFixed(1) + 'px">';
+    s += '<circle class="halo" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) +
+         '" r="7.5" fill="var(--chart)" opacity=".28"/>';
     s += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) +
-         '" r="7.5" fill="var(--chart)" stroke="var(--sea)" stroke-width="1.5"/>';
-    s += '<text x="' + x.toFixed(1) + '" y="' + (y + 2.6).toFixed(1) +
+         '" r="8" fill="var(--chart)" stroke="var(--card)" stroke-width="2"/>';
+    s += '<text x="' + x.toFixed(1) + '" y="' + (y + 2.8).toFixed(1) +
          '" text-anchor="middle" font-size="8.5" font-weight="600" fill="#fff">' + (n+1) + '</text>';
+    s += '</g>';
     s += '<text x="' + tx.toFixed(1) + '" y="' + ty.toFixed(1) + '" text-anchor="' + anchor +
-         '" font-size="9" fill="var(--ink)" paint-order="stroke" stroke="var(--sea)" stroke-width="3">' +
-         esc(g[2]) + '</text>';
+         '" font-size="9" font-weight="500" fill="var(--ink)" paint-order="stroke" ' +
+         'stroke="var(--sea)" stroke-width="3.5">' + esc(g[2]) + '</text>';
     s += '</a>';
   });
 
@@ -894,8 +980,8 @@ var TASKS = [
     why:"차당 2명씩 교대할 수 있어야 9/16 북부 드라이브(왕복 4시간+)가 굴러갑니다. 술이 붙는 날의 금주 운전자와는 별개 문제입니다. <b>경찰서·면허시험장 당일 발급이지만 평일만 — 출발까지 평일이 나흘뿐입니다.</b> 렌터카 계약서에 운전자 전원을 등재해야 사고 시 보험이 적용됩니다." },
   { id:"bbq", name:"숙소에 BBQ 가능한지 확인", tag:"9/13 저녁이 걸림",
     why:"첫날 저녁 계획 전체가 여기 달려 있고, 식당 예약이 안 되는 날의 보험이기도 합니다. <b>냉장고 용량</b>(14인분 장보기)과 <b>세탁기 세제 유무</b>(짐을 줄인 만큼 세탁을 하게 됩니다)도 같이 물어보세요." },
-  { id:"fund", name:"추가 회비 걷기", tag:"금액 확정 후",
-    why:"예산 탭이 부족액을 알려줍니다. 현지에서 돈이 떨어져 급하게 걷는 것보다 출발 전에 걷고 남으면 돌려주는 편이 낫습니다. 야키니쿠 단가와 렌터카 결제 여부가 확인된 뒤에 최종 금액을 정하세요." }
+  { id:"fund", name:"큰 지출 결제 방법 정하기", tag:"금액 확정 후",
+    why:"예산 탭에서 1인당 얼마가 드는지 볼 수 있습니다. 큰 지출은 미리 나눠 내거나 한 명이 결제하고 정산하는 편이 현장에서 빠릅니다. 야키니쿠 단가가 확인되면 숫자가 확정됩니다." }
 ];
 
 var FIXED = [
@@ -920,7 +1006,7 @@ function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} 
 
 /* ─── 상태 (저장은 이 기기 안에서만) ─── */
 var checks = load("isg-checks", {});
-var facts  = { yak:5500, fer:1880, car:0, fx:9.37 };
+var facts  = { yak:5500, fer:1880, car:0, fx:9.37, solo:15000, manta:9500 };
 var sf = load("isg-facts", null);
 if (sf) Object.keys(facts).forEach(function(k){
   if (typeof sf[k] === "number" && isFinite(sf[k])) facts[k] = sf[k];
@@ -1054,7 +1140,7 @@ function renderToday(){
   } else if (afterTrip) {
     h += '<div class="hero"><span class="lbl">여행 종료</span>' +
          '<div class="big">잘 다녀오셨습니다</div>' +
-         '<p>남은 공금은 정산 앱의 현황 화면에서 각자 돌려받을 금액으로 그대로 보입니다.</p></div>';
+         '<p>쓴 돈 정산만 남았습니다. 예산 탭의 1인당 금액을 기준으로 맞춰보세요.</p></div>';
   } else {
     h += '<div class="hero"><span class="lbl">출발까지</span>' +
          '<div class="cnt">D-' + daysLeft + '</div>' +
@@ -1101,99 +1187,92 @@ function renderPlan(){
   $("v-plan").innerHTML = '<div class="dayseg">' + segs + '</div>' + body;
 }
 
-/* ─── 할일 ─── */
-function renderTodo(){
-  var n = TASKS.filter(function(t){ return checks[t.id] && checks[t.id].done; }).length;
-  var pct = Math.round(n / TASKS.length * 100);
-  var h = '<div class="vhead"><h2>남은 일곱 가지</h2>' +
-    '<p>전화를 돌리는 사람이 이 화면 하나만 보면 됩니다. 체크는 이 기기에 저장되니 앱을 닫아도 그대로입니다.</p></div>' +
-    '<div class="prog"><div class="prog-l"><span>' + n + ' / ' + TASKS.length + ' 완료</span><span>' + pct + '%</span></div>' +
-    '<div class="prog-t"><div class="prog-f" style="width:' + pct + '%"></div></div></div>';
-
-  TASKS.forEach(function(t){
-    var c = checks[t.id] || {}, done = !!c.done;
-    h += '<div class="card"><div class="task' + (done ? " is-done" : "") + '" data-id="' + t.id + '">' +
-      '<button class="box" type="button" aria-pressed="' + done + '" aria-label="' + esc(t.name) + ' 완료 표시">✓</button>' +
-      '<div class="t-body"><div class="t-top"><span class="t-name">' + esc(t.name) + '</span>' +
-      '<span class="t-tag">' + (done ? "완료" : esc(t.tag)) + '</span></div>';
-    if (t.tel || t.link || t.site) {
-      h += '<div class="calls">';
-      if (t.tel)  h += '<a class="btn" href="tel:' + t.tel.replace(/-/g,"") + '">📞 ' + t.tel + '</a>';
-      if (t.link) h += '<a class="btn ghost" href="' + t.link + '" target="_blank" rel="noopener">' + esc(t.linkLabel) + '</a>';
-      if (t.site) h += '<a class="btn ghost" href="' + t.site + '" target="_blank" rel="noopener">홈페이지</a>';
-      h += '</div>';
-    }
-    h += '<p class="t-why">' + t.why + '</p>';
-    if (t.jp) h += '<div class="script"><span class="lbl">이렇게 물어보세요</span>' +
-      esc(t.jp) + '<span class="ko">' + esc(t.ko) + '</span></div>';
-    if (done) {
-      var when = c.at ? new Date(c.at).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "";
-      h += '<p class="done-by">✓ ' + (c.by ? esc(c.by) + " · " : "") + esc(when) + '</p>';
-    }
-    h += '</div></div></div>';
-  });
-  $("v-todo").innerHTML = h;
-}
 
 /* ─── 예산 ─── */
 function renderMoney(){
-  /* 검수에서 채택한 안의 비용을 얹습니다 */
+  /* 공금 개념 없이, 1인이 얼마나 쓰는지만 봅니다.
+     함께 내는 항목은 14로 나누고, 개인이 따로 쓰는 건 그대로 더합니다. */
   var items = FIXED.slice();
   if (adopted["manta-private"]) items = items.filter(function(r){ return r[0].indexOf("만타") !== 0; });
-  if (adopted["monkey"]) items.push(["야이마무라 입촌료", 15120, "1,080엔 × 14 · 희망자만이면 그만큼 줄어듭니다"]);
+  if (adopted["monkey"]) items.push(["야이마무라 입촌료", 15120, "1,080엔 × 14"]);
 
-  var fixedSum = 0; items.forEach(function(r){ fixedSum += r[1]; });
-  var yak = facts.yak * PAX, fer = facts.fer * PAX, car = facts.car;
-  var need = fixedSum + yak + fer + car;
-  var have = FUND_KRW / facts.fx;
-  var gap  = need - have, over = gap > 0;
-  var perKRW = Math.abs(gap) * facts.fx / PAX;
-  var scale = Math.max(Math.ceil(Math.max(need,have)/100000)*100000, 100000);
+  var shared = 0; items.forEach(function(r){ shared += r[1]; });
+  shared += facts.yak * PAX + facts.fer * PAX;
+
+  var perShared = shared / PAX;
+  var solo = facts.solo;                       /* 기념품·개인 술·간식 등 */
+  var mantaSolo = adopted["manta-private"] ? facts.manta : 0;
+  var perTotal = perShared + solo + mantaSolo;
+
+  var CAT = [
+    ["바다 투어", items.filter(function(r){ return /만타|환상|글라스보트/.test(r[0]); })
+        .reduce(function(a,r){ return a + r[1]; }, 0) / PAX + mantaSolo, "만타 · 환상의 섬 · 글라스보트"],
+    ["식사·술", (items.filter(function(r){ return /회식|우사기야|식료품/.test(r[0]); })
+        .reduce(function(a,r){ return a + r[1]; }, 0) + facts.yak * PAX) / PAX, "숙소 회식 · 야키니쿠 · 우사기야 · 아침"],
+    ["교통", (items.filter(function(r){ return /택시|주유|주차/.test(r[0]); })
+        .reduce(function(a,r){ return a + r[1]; }, 0) + facts.fer * PAX) / PAX, "페리 · 택시 · 주유 · 주차"],
+    ["개인 지출", solo, "기념품 · 개인 술 · 간식 · 자잘한 것"]
+  ];
+  var catMax = Math.max.apply(null, CAT.map(function(c){ return c[1]; }));
+
+  var h = '<div class="vhead"><h2>1인당 얼마</h2>' +
+    '<p>함께 내는 건 14로 나누고, 개인이 따로 쓰는 건 그대로 더했습니다. 숙소와 항공은 이미 낸 것이라 뺐습니다.</p></div>';
+
+  h += '<div class="verdict big"><span class="lbl">1인당 예상</span>' +
+    '<div class="amt">' + yen(perTotal) + '</div>' +
+    '<div class="per">' + won(perTotal * facts.fx) + '</div>' +
+    '<p>공동 ' + yen(perShared) + ' + 개인 ' + yen(solo + mantaSolo) + '. ' +
+    '전체로 보면 14명이 ' + yen(shared + (solo + mantaSolo) * PAX) + ' 정도를 씁니다.</p></div>';
+
+  h += '<div class="card"><div class="inputs">' +
+    fld("f-yak","야키니쿠 1인 단가","기타우치 목장 · 9/14",facts.yak,100,"엔") +
+    fld("f-fer","페리 왕복 요금","다케토미 · 1인",facts.fer,10,"엔") +
+    fld("f-solo","개인 지출 예상","기념품 · 술 · 간식",facts.solo,1000,"엔") +
+    fld("f-fx","환율","오늘 기준으로",facts.fx,0.01,"원/엔") +
+    '</div>';
+  if (adopted["manta-private"]) {
+    h += '<div class="inputs" style="margin-top:12px"><div class="ifield" style="grid-column:1/-1">' +
+      '<label for="f-manta">만타 투어 <small>희망자만 개인 부담 — 안 가면 0</small></label>' +
+      '<div class="irow"><input id="f-manta" type="number" inputmode="numeric" min="0" step="500" value="' +
+      facts.manta + '"><span class="unit">엔</span></div></div></div>';
+  }
+  h += '</div>';
+
+  h += '<div class="sec-label">어디에 쓰나</div><div class="card"><div class="cats">';
+  CAT.forEach(function(c){
+    var pct = catMax ? c[1] / catMax * 100 : 0;
+    h += '<div class="cat"><div class="cat-l"><span>' + c[0] + '</span><b>' + yen(c[1]) + '</b></div>' +
+      '<div class="cat-t"><div class="cat-f" style="width:' + pct.toFixed(1) + '%"></div></div>' +
+      '<small>' + c[2] + '</small></div>';
+  });
+  h += '</div></div>';
 
   var rows = "";
-  rows += '<tr class="var"><td>야키니쿠 9/14<small>1인 ' + facts.yak.toLocaleString("en-US") + '엔 × 14</small></td><td class="r">' + yak.toLocaleString("en-US") + '</td></tr>';
-  rows += '<tr class="var"><td>다케토미 페리<small>왕복 1인 ' + facts.fer.toLocaleString("en-US") + '엔 × 14</small></td><td class="r">' + fer.toLocaleString("en-US") + '</td></tr>';
-  if (car > 0) rows += '<tr class="var"><td>렌터카<small>공금에서 지출</small></td><td class="r">' + car.toLocaleString("en-US") + '</td></tr>';
+  rows += '<tr class="var"><td>야키니쿠 9/14<small>1인 ' + facts.yak.toLocaleString("en-US") + '엔</small></td>' +
+    '<td class="r">' + facts.yak.toLocaleString("en-US") + '</td></tr>';
+  rows += '<tr class="var"><td>다케토미 페리<small>왕복 1인</small></td>' +
+    '<td class="r">' + facts.fer.toLocaleString("en-US") + '</td></tr>';
   items.forEach(function(r){
-    rows += '<tr><td>' + r[0] + '<small>' + r[2] + '</small></td><td class="r">' + r[1].toLocaleString("en-US") + '</td></tr>';
+    rows += '<tr><td>' + r[0] + '<small>' + r[2] + ' ÷ 14</small></td>' +
+      '<td class="r">' + Math.round(r[1] / PAX).toLocaleString("en-US") + '</td></tr>';
   });
-  rows += '<tr class="sum"><td>필요액</td><td class="r">' + yen(need) + '</td></tr>';
-  rows += '<tr><td>가용 공금<small>' + won(FUND_KRW) + ' ÷ ' + facts.fx + '</small></td><td class="r">−' + Math.round(have).toLocaleString("en-US") + '</td></tr>';
-  rows += '<tr class="gapr"><td>' + (over ? "부족" : "여유") + '</td><td class="r">' + yen(Math.abs(gap)) + '</td></tr>';
+  if (mantaSolo) rows += '<tr class="var"><td>만타 투어<small>희망자 개인 부담</small></td>' +
+    '<td class="r">' + mantaSolo.toLocaleString("en-US") + '</td></tr>';
+  rows += '<tr class="var"><td>개인 지출<small>기념품 · 술 · 간식</small></td>' +
+    '<td class="r">' + solo.toLocaleString("en-US") + '</td></tr>';
+  rows += '<tr class="sum"><td>1인당 합계</td><td class="r">' + yen(perTotal) + '</td></tr>';
 
-  var h = '<div class="vhead"><h2>공금 계산기</h2>' +
-    '<p>전화로 확인한 숫자를 넣으면 부족액이 바로 다시 계산됩니다.</p></div>' +
-    '<div class="card"><div class="inputs">' +
-      fld("f-yak","야키니쿠 1인 단가","기타우치 목장 · 9/14",facts.yak,100,"엔") +
-      fld("f-fer","페리 왕복 요금","다케토미 · 1인",facts.fer,10,"엔") +
-      fld("f-car","렌터카","공금에서 나가면 금액",facts.car,1000,"엔") +
-      fld("f-fx","규정 환율","출발일 아침에 확정",facts.fx,0.01,"원/엔") +
-    '</div></div>';
+  h += '<div class="sec-label">1인당 내역</div><div class="card">' +
+    '<table><thead><tr><th>항목</th><th class="r">1인 엔</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
 
-  h += '<div class="verdict' + (over ? "" : " ok") + '"><span class="lbl">' + (over ? "부족액" : "여유") + '</span>' +
-    '<div class="amt">' + yen(Math.abs(gap)) + '</div>' +
-    '<div class="per">1인 ' + won(perKRW) + '</div>' +
-    '<p>' + (over
-      ? "출발 전에 1인 " + won(Math.ceil(perKRW/10000)*10000) + "씩 더 걷고, 남으면 돌려주는 편이 낫습니다. 현지에서 급하게 걷는 것보다 낫습니다."
-      : "지금 계산으로는 공금이 남습니다. 남은 금액은 정산 앱에서 각자 몫으로 돌아갑니다.") + '</p></div>';
+  h += '<div class="card cash"><div class="card-h"><h3>현금은 얼마나</h3></div>' +
+    '<p>다케토미항 창구와 작은 식당은 <b>현금만</b> 받습니다. 카드가 되는 곳이 많아졌지만 ' +
+    '<b>1인 1~1.5만엔</b>은 들고 가세요. 야키니쿠·우사기야처럼 큰 금액은 카드가 되는지 예약할 때 확인해두면 ' +
+    '현금을 덜 챙겨도 됩니다.</p></div>';
 
-  h += '<div class="card"><div class="bars">' +
-    '<div class="bar-row"><div class="bl"><span>가용 공금</span><span>' + yen(have) + '</span></div>' +
-    '<div class="track"><div class="fill have" style="width:' + (have/scale*100) + '%"></div></div></div>' +
-    '<div class="bar-row"><div class="bl"><span>필요 추정</span><span>' + yen(need) + '</span></div>' +
-    '<div class="track"><div class="fill need" style="width:' + (need/scale*100) + '%"></div></div></div>' +
-    '</div><div class="scale"><span>¥0</span><span>' + yen(scale/2) + '</span><span>' + yen(scale) + '</span></div></div>';
+  h += '<p class="fine">숙소(4,187,787원)와 항공권은 이미 낸 것이라 이 계산에서 뺐습니다. ' +
+    '렌터카도 결제가 끝난 것으로 보고 넣지 않았습니다. 여기 숫자는 <b>현지에서 새로 나가는 돈</b>만 봅니다.</p>';
 
-  h += '<div class="sec-label">내역</div><div class="card">' +
-    '<table><thead><tr><th>항목</th><th class="r">엔</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
-
-  h += '<div class="sec-label">모자랄 때 쓸 수 있는 카드</div><div class="card">' +
-    fix("+84만원","1인 6만원씩 지금 더 걷기",'<span class="pick">추천</span>',"가장 단순하고 확실합니다. 현지에서 돈이 떨어져 급하게 걷는 것보다, 출발 전에 여유 있게 걷고 남으면 돌려주는 편이 낫습니다.") +
-    fix("−21,000","가비라만 글라스보트를 개인 부담으로","","전원이 반드시 타야 하는 일정이 아닙니다. 타고 싶은 사람만 현장에서 각자 내면 공금에서 빠집니다.") +
-    fix("−56,000","우사기야 대신 마지막 밤도 숙소 BBQ","","절감액은 가장 크지만 권하지 않습니다. 5일 중 외식이 이미 두 번뿐이고, 섬 노래 라이브는 이 여행에서 이시가키다운 몇 안 되는 순간입니다.") +
-    '</div>';
-
-  h += '<p style="font-size:12px;color:var(--ink-3);line-height:1.6">회비 700만원 − 숙소 4,187,787원 = 잔액 2,812,213원 기준. 항공권은 별도로 봤습니다. 렌터카는 기본값 0 — 이미 결제된 것으로 가정했으니, 공금에서 나가야 한다면 위에 금액을 넣으세요.</p>';
   $("v-money").innerHTML = h;
 }
 function fld(id,label,hint,val,step,unit){
@@ -1352,7 +1431,7 @@ var TEAM_ROLES = [
   ["총괄","<b>여행 전체에 한 명.</b> 갈라질 때 집합 시각과 장소를 선언하고, 예약 시각을 관리합니다. 결정이 필요할 때 이 사람이 정합니다.","1명"],
   ["차장","차 한 대의 인원과 짐을 책임집니다. 출발 전 <b>내 차 7명</b>만 세면 됩니다. 페리 QR도 차장이 하나씩 듭니다.","차당 1명"],
   ["운전","차당 <b>2명</b>이 국제운전면허증을 갖고 교대합니다. 9/16 북부 드라이브는 왕복 4시간이 넘습니다.","차당 2명"],
-  ["총무","공금 카드와 정산 앱 입력. <b>한 명만</b> — 여러 명이 넣으면 같은 지출이 중복으로 잡힙니다.","1명"]
+  ["총무","큰 지출을 대표로 결제하고 기록합니다. <b>한 명만</b> — 여러 명이 적으면 같은 지출이 중복으로 잡힙니다.","1명"]
 ];
 var SOBER = [
   ["9/13","숙소 회식","불필요","마트에서 사와 숙소에서 먹으니 차를 안 씁니다"],
@@ -1427,13 +1506,36 @@ function renderInfo(){
   if (adopted["teams"]) {
     h += '<details open><summary>A조 · B조 나누는 법</summary><div class="dbody">' + teamsHTML() + '</div></details>';
   }
-  h += '<details><summary>남은 할 일 ' + TASKS.filter(function(t){ return !(checks[t.id] && checks[t.id].done); }).length +
-    '건 — 전화와 예약</summary><div class="dbody"><p class="tlede">항목별 상세와 일본어 문의 문장은 <b>할일 탭</b>에 있습니다. 여기서는 목록만 봅니다.</p><ul class="brief">' +
-    TASKS.map(function(t){
-      var done = checks[t.id] && checks[t.id].done;
-      return '<li class="' + (done ? "ok" : "") + '">' + (done ? "✓ " : "· ") + esc(t.name) +
-        (t.tel ? ' <a class="tinytel" href="tel:' + t.tel.replace(/-/g,"") + '">' + t.tel + '</a>' : '') + '</li>';
-    }).join("") + '</ul></div></details>';
+  var left = TASKS.filter(function(t){ return !(checks[t.id] && checks[t.id].done); }).length;
+  var doneN = TASKS.length - left;
+  h += '<details' + (left ? ' open' : '') + '><summary>예약과 전화 · ' + doneN + '/' + TASKS.length + ' 완료</summary>' +
+    '<div class="dbody"><div class="prog"><div class="prog-l"><span>' + doneN + ' / ' + TASKS.length + '</span>' +
+    '<span>' + Math.round(doneN / TASKS.length * 100) + '%</span></div>' +
+    '<div class="prog-t"><div class="prog-f" style="width:' + (doneN / TASKS.length * 100) + '%"></div></div></div>';
+
+  TASKS.forEach(function(t){
+    var c = checks[t.id] || {}, done = !!c.done;
+    h += '<div class="task' + (done ? " is-done" : "") + '" data-id="' + t.id + '">' +
+      '<button class="box" type="button" aria-pressed="' + done + '" aria-label="' + esc(t.name) + ' 완료 표시">✓</button>' +
+      '<div class="t-body"><div class="t-top"><span class="t-name">' + esc(t.name) + '</span>' +
+      '<span class="t-tag">' + (done ? "완료" : esc(t.tag)) + '</span></div>';
+    if (t.tel || t.link || t.site) {
+      h += '<div class="calls">';
+      if (t.tel)  h += '<a class="btn" href="tel:' + t.tel.replace(/-/g,"") + '">📞 ' + t.tel + '</a>';
+      if (t.link) h += '<a class="btn ghost" href="' + t.link + '" target="_blank" rel="noopener">' + esc(t.linkLabel) + '</a>';
+      if (t.site) h += '<a class="btn ghost" href="' + t.site + '" target="_blank" rel="noopener">홈페이지</a>';
+      h += '</div>';
+    }
+    h += '<p class="t-why">' + t.why + '</p>';
+    if (t.jp) h += '<div class="script"><span class="lbl">이렇게 물어보세요</span>' +
+      esc(t.jp) + '<span class="ko">' + esc(t.ko) + '</span></div>';
+    if (done) {
+      var when = c.at ? new Date(c.at).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "";
+      h += '<p class="done-by">✓ ' + (c.by ? esc(c.by) + " · " : "") + esc(when) + '</p>';
+    }
+    h += '</div></div>';
+  });
+  h += '</div></details>';
   var lastCat = "";
   h += '<details open><summary>예약처 · 홈페이지 ' + LINKS.length + '곳</summary><div class="dbody">' +
     '<p class="tlede">2026-09-07에 전부 접속을 확인했습니다. 누르면 새 창으로 열립니다.</p>';
@@ -1461,8 +1563,8 @@ function renderInfo(){
 }
 
 /* ─── 탭 ─── */
-var VIEWS = ["today","plan","food","todo","money","info"];
-var RENDER = { today:renderToday, plan:renderPlan, food:renderFood, todo:renderTodo, money:renderMoney, info:renderInfo };
+var VIEWS = ["today","plan","food","money","info"];
+var RENDER = { today:renderToday, plan:renderPlan, food:renderFood, money:renderMoney, info:renderInfo };
 var current = "today";
 
 function show(name){
@@ -1509,7 +1611,7 @@ $("views").addEventListener("click", function(e){
     if (checks[id] && checks[id].done) delete checks[id];
     else checks[id] = { done:true, by:me, at:Date.now() };
     save("isg-checks", checks);
-    renderTodo();
+    renderInfo();
   }
 });
 
@@ -1520,7 +1622,7 @@ $("views").addEventListener("input", function(e){
     try { localStorage.setItem("isg-name", me); } catch(err){}
     return;
   }
-  var map = { "f-yak":"yak", "f-fer":"fer", "f-car":"car", "f-fx":"fx" };
+  var map = { "f-yak":"yak", "f-fer":"fer", "f-car":"car", "f-fx":"fx", "f-solo":"solo", "f-manta":"manta" };
   var k = map[t.id];
   if (!k) return;
   var v = parseFloat(t.value);
