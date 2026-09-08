@@ -453,7 +453,28 @@ tr.gapr td{border:0;font-weight:600;color:var(--chart)}
 .fmeta b{color:var(--chart);font-weight:600}
 .t-tag.alt{background:var(--rule-soft);color:var(--ink-3)}
 .t-tag.ok{background:var(--ok-soft);color:var(--ok)}
-.card.cafe{padding:16px 18px}
+
+/* 카페 — 날짜별 한 장, 안에 한 줄씩 */
+.cafeday{padding:0;overflow:hidden}
+.cd-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+  padding:14px 18px;background:var(--shoal-soft)}
+.cd-head b{font-family:"Jua",sans-serif;font-size:17px;letter-spacing:.01em}
+.cd-head span{font-size:12px;color:var(--ink-2);background:var(--card);
+  padding:1px 8px;border-radius:100px}
+.cd-head em{flex:1 1 100%;font-style:normal;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+.crow{display:flex;align-items:flex-start;gap:12px;padding:13px 18px;
+  border-top:1px solid var(--rule-soft);text-decoration:none;color:inherit}
+.crow:hover{background:var(--field)}
+.cr-main{flex:1;min-width:0}
+.cr-main b{font-size:14.5px;font-weight:600;vertical-align:middle}
+.cr-meta{display:block;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+  color:var(--ink-3);margin-top:3px}
+.crow small{display:block;font-size:12.5px;color:var(--ink-2);line-height:1.55;margin-top:4px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:var(--rule);margin-left:7px;vertical-align:middle}
+.dot.on{background:var(--ok)}
+.crow .arw{font-family:"IBM Plex Mono",monospace;color:var(--chart);font-size:13px;
+  flex:0 0 auto;padding-top:2px}
 .btn.tiny{margin-top:8px;padding:6px 12px;font-size:12.5px}
 
 /* ═══ 예약처 링크 ═══ */
@@ -1339,49 +1360,37 @@ var GROUP_REST = [
   ["이시가키규 마루","야키니쿠","좌석 미공개","16:00~22:30 (L.O. 21:30) · 라인·넷 예약 · 14명 가능한지 물어봐야 합니다","石垣牛 まる","050-1722-5409",0,"https://ishigaki-maru.com/"]
 ];
 
-/* 카페 — 우리 동선 위에 있는 곳만.
-   [언제·어디, 이름, 위치, 시간·휴무, 메모, 구글맵 검색어, 전화, 우리날짜에영업] */
-var CAFES = [
-  ["9/16 북부","ウリウリカフェ (우리우리)","이하라마 2-511 · 다마토리자키 바로 옆",
-   "11:00~15:00 (L.O. 14:30) · 목·금 휴무",
-   "이시가키규 햄버거가 간판. 다마토리자키에서 내려오는 길목이라 북부 점심을 여기서 해결해도 됩니다",
-   "UliUli Cafe 石垣島","0980-89-2002",1],
-  ["9/16 북부","ISHIGAKI MARKET","이하라마 · 바다가 보이는 자리",
-   "월·화 휴무 — 5일 중 수요일만 됩니다",
-   "섬 농가 직송 과일 팬케이크와 빙수, 갈릭슈림프. 히라쿠보에서 돌아오는 길",
-   "ISHIGAKI MARKET 石垣市伊原間","",1],
-  ["9/16 가비라","R's Cafe","가비라",
-   "10:00~17:00 · 연중무휴",
-   "휴무 걱정이 없는 유일한 곳. 가비라만에서 두 시간 넘게 머무니 여기서 쉬면 됩니다",
-   "R's Cafe 川平","",1],
-  ["9/16 가비라","アロアロカフェ (아로아로)","가비라 · 요네하라 비치 앞",
-   "11:00~17:30 · 일요일 휴무",
-   "테라스에서 바다를 정면으로. 요네하라를 끼워 넣는다면 여기",
-   "ALOALO CAFE 石垣島","",1],
-  ["9/16 가비라","カリブカフェ (카리브)","가비라",
-   "11:00~15:00 · 월요일 휴무",
-   "가비라만 전망. 점심을 겸할 수 있습니다",
-   "カリブカフェ 川平","",1],
-  ["9/14 시내","リハロウビーチ (리하로우)","마에자토 · 바다 앞",
-   "10:00~16:30",
-   "투어 점심 휴식(11:30~13:30)이나 끝나고 들르기 좋습니다. 공항·숙소 가는 길목",
-   "Rehellow beach 石垣島","",1],
-  ["9/14 시내","プカプカ (푸카푸카)","마에자토",
-   "11:00~20:00",
-   "늦게까지 열어 투어가 끝난 뒤에도 갈 수 있습니다",
-   "プカプカ 石垣島 真栄里","",1],
-  ["9/15 다케토미","HaaYa nagomi-cafe","나고미노토 바로 앞",
-   "휴무 확인 필요",
-   "섬에서 유일한 2층 카페. 빙수·케이크세트와 카레·타코라이스. 붉은 기와 지붕을 내려다봅니다",
-   "HaaYa nagomi cafe 竹富島","",0],
-  ["9/15 다케토미","ぱーらー願寿屋 (간주야)","아이노타 집락 입구",
-   "11:00~17:00 (L.O. 16:30)",
-   "블루씰 아이스크림과 빙수. 물소 수레 코스 근처",
-   "ぱーらー願寿屋 竹富島","",0],
-  ["9/15 시내","트래블러즈 카페 사쿠","유글레나몰 근처",
-   "휴무 확인 필요",
-   "쇼핑하다 쉬기. 아침·브런치로도 인기",
-   "トラベラーズカフェ朔 石垣島","",0]
+/* 카페 — 날짜순. [이름, 위치, 시간·휴무, 메모, 검색어, 전화, 그날영업] */
+var CAFE_DAYS = [
+  { d:"9/14", wd:"월", ctx:"투어 점심 휴식 11:30~13:30 · 항구에 내려 있습니다",
+    rows:[
+      ["트래블러즈 카페 사쿠","유글레나몰 · 도보 5분","휴무 확인 필요",
+       "항구에서 걸어갈 수 있는 유일한 축. 아침·브런치로도 인기","トラベラーズカフェ朔 石垣島","",0],
+      ["리하로우 비치","마에자토 · 차 10분","10:00~16:30",
+       "바다를 정면으로 보는 자리. 공항·숙소 가는 길목이라 투어 끝나고도 좋습니다","Rehellow beach 石垣島","",1],
+      ["푸카푸카","마에자토 · 차 10분","11:00~20:00","늦게까지 열어 야키니쿠 전에도 갈 수 있습니다","プカプカ 石垣島 真栄里","",1]
+    ]},
+  { d:"9/15", wd:"화", ctx:"다케토미 오전 · 시내 쇼핑 오후",
+    rows:[
+      ["하야 나고미 카페","다케토미 · 나고미노토 앞","휴무 확인 필요",
+       "섬에서 유일한 2층 카페. 붉은 기와 지붕을 내려다보며 빙수와 케이크","HaaYa nagomi cafe 竹富島","",0],
+      ["파라 간주야","다케토미 · 아이노타 입구","11:00~17:00 (L.O. 16:30)",
+       "블루씰 아이스크림과 빙수. 물소 수레 코스 근처","ぱーらー願寿屋 竹富島","",0],
+      ["트래블러즈 카페 사쿠","유글레나몰 · 쇼핑 중","휴무 확인 필요",
+       "기념품 사다가 쉬어가기","トラベラーズカフェ朔 石垣島","",0]
+    ]},
+  { d:"9/16", wd:"수", ctx:"북부 드라이브 · 휴무일이 서로 반대라 수요일엔 다 열립니다",
+    rows:[
+      ["우리우리 카페","이하라마 · 다마토리자키 옆","11:00~15:00 · 목·금 휴무",
+       "이시가키규 햄버거가 간판. 북부 점심을 여기서 해결해도 됩니다","UliUli Cafe 石垣島","0980-89-2002",1],
+      ["ISHIGAKI MARKET","이하라마 · 바다 전망","월·화 휴무 — 수요일만",
+       "섬 농가 직송 과일 팬케이크와 빙수. 히라쿠보에서 내려오는 길","ISHIGAKI MARKET 石垣市伊原間","",1],
+      ["R's Cafe","가비라","10:00~17:00 · 연중무휴",
+       "휴무 걱정이 없는 유일한 곳. 가비라만에 두 시간 넘게 머무니 여기서 쉬면 됩니다","R's Cafe 川平","",1],
+      ["아로아로 카페","가비라 · 요네하라 비치 앞","11:00~17:30 · 일요일 휴무",
+       "테라스에서 바다를 정면으로","ALOALO CAFE 石垣島","",1],
+      ["카리브 카페","가비라","11:00~15:00 · 월요일 휴무","가비라만 전망. 점심을 겸할 수 있습니다","カリブカフェ 川平","",1]
+    ]}
 ];
 
 /* 점심 — 예약 없이 가는 곳. 휴무일이 제각각이라 그것만 맞추면 됩니다 */
@@ -1438,23 +1447,20 @@ function renderFood(){
   h += '<p class="note"><b>石垣庵은 후보에서 빼세요</b> — 66석이지만 연회 착석이 10명까지라 14명이 안 들어갑니다. ' +
        '기타우치 목장 미사키점은 2024년 3월에 닫았습니다. 야마모토(炭火焼肉 やまもと)는 가장 유명하지만 작고 예약이 한참 전에 찹니다.</p>';
 
-  h += '<div class="sec-label">카페 — 동선 위에 있는 곳만</div>';
-  h += '<p class="fnote" style="border:0;padding:0;margin-bottom:12px">휴무일이 제각각이라 <b>우리 날짜에 문을 여는지</b>를 같이 적었습니다. ' +
-       '초록 표시가 영업 확인된 곳입니다.</p>';
-  var lastWhen = "";
-  CAFES.forEach(function(c){
-    if (c[0] !== lastWhen) { h += '<div class="sub-label">' + esc(c[0]) + '</div>'; lastWhen = c[0]; }
-    h += '<div class="card cafe"><div class="t-top"><span class="t-name">' + esc(c[1]) + '</span>' +
-      '<span class="t-tag' + (c[7] ? " ok" : " alt") + '">' + (c[7] ? "그날 영업" : "확인 필요") + '</span></div>' +
-      '<div class="fmeta"><span>' + esc(c[2]) + '</span><b>' + esc(c[3]) + '</b></div>' +
-      '<p class="t-why">' + esc(c[4]) + '</p><div class="calls">' +
-      (c[6] ? '<a class="btn" href="tel:' + c[6].replace(/-/g,"") + '">📞 ' + c[6] + '</a>' : '') +
-      '<a class="btn ghost" href="' + gmap(c[5]) + '" target="_blank" rel="noopener">지도</a></div></div>';
+  h += '<div class="sec-label">카페</div>';
+  CAFE_DAYS.forEach(function(D){
+    h += '<div class="card cafeday"><div class="cd-head"><b>' + D.d + '</b><span>' + D.wd + '</span>' +
+      '<em>' + esc(D.ctx) + '</em></div>';
+    D.rows.forEach(function(c){
+      h += '<a class="crow" href="' + gmap(c[4]) + '" target="_blank" rel="noopener">' +
+        '<span class="cr-main"><b>' + esc(c[0]) + '</b>' +
+        '<i class="dot' + (c[6] ? ' on' : '') + '" title="' + (c[6] ? '그날 영업 확인' : '휴무 확인 필요') + '"></i>' +
+        '<span class="cr-meta">' + esc(c[1]) + '  ·  ' + esc(c[2]) + '</span>' +
+        '<small>' + esc(c[3]) + '</small></span><span class="arw">↗</span></a>';
+    });
+    h += '</div>';
   });
-  h += '<p class="note"><b>9/16 북부는 카페가 잘 맞습니다.</b> 우리우리는 목·금 휴무, 이시가키 마켓은 월·화 휴무라 ' +
-       '<b>수요일에 둘 다 열립니다.</b> 둘 다 이하라마에 있어 다마토리자키·히라쿠보자키 사이 길목입니다 — ' +
-       '북부 점심을 신가키 식당 대신 여기서 해결해도 됩니다.</p>';
-
+  h += '<p class="note"><b>초록 점이 그날 영업을 확인한 곳입니다.</b> 회색은 휴무일을 못 찾은 곳이라 가기 전에 한 번 보세요 — 이시가키는 화·수 휴무가 흔합니다. 이름을 누르면 구글지도가 열립니다.</p>';
   h += '<div class="sec-label">점심 — 예약 없이</div><div class="card">';
   LUNCH.forEach(function(r){ h += foodRow(r[1], r[0], r[2], r[3], r[4]); });
   h += '</div>';
