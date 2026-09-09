@@ -167,7 +167,7 @@ button{font:inherit;color:inherit}
 .view{padding:20px 20px 32px;max-width:640px;margin:0 auto}
 
 .tabbar{
-  flex:0 0 auto;display:grid;grid-template-columns:repeat(5,1fr);
+  flex:0 0 auto;display:grid;grid-template-columns:repeat(6,1fr);
   background:var(--bar);backdrop-filter:saturate(180%) blur(12px);
   border-top:1px solid var(--rule-soft);
   padding-bottom:env(safe-area-inset-bottom);
@@ -176,7 +176,7 @@ button{font:inherit;color:inherit}
   background:none;border:0;padding:9px 2px 8px;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;gap:3px;
   color:var(--ink-3);font-size:10.5px;letter-spacing:-.01em;
-  border-top:2px solid transparent;margin-top:-1px;
+  border-top:2px solid transparent;margin-top:-1px;min-width:0;
 }
 .tab svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;
   stroke-linecap:round;stroke-linejoin:round}
@@ -477,6 +477,20 @@ tr.gapr td{border:0;font-weight:600;color:var(--chart)}
   flex:0 0 auto;padding-top:2px}
 .btn.tiny{margin-top:8px;padding:6px 12px;font-size:12.5px}
 
+/* 음식점·카페 위치 지도 */
+.place-map{padding-bottom:14px}
+.place-map .map{margin-top:0}
+.place-pin circle{transition:transform .15s;transform-box:fill-box;transform-origin:center}
+.place-pin:hover circle{transform:scale(1.16)}
+.place-key{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px}
+.place-key a{display:flex;align-items:center;gap:7px;min-width:0;padding:7px 9px;
+  border-radius:10px;background:var(--field);color:inherit;text-decoration:none;font-size:12px}
+.place-key a:hover{background:var(--shoal-soft)}
+.place-key b{display:grid;place-items:center;flex:0 0 20px;width:20px;height:20px;border-radius:50%;
+  background:var(--chart);color:#fff;font-family:"IBM Plex Mono",monospace;font-size:10px}
+.place-key span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:400px){.place-key{grid-template-columns:1fr}}
+
 /* ═══ 예약처 링크 ═══ */
 .link-row{display:flex;align-items:center;justify-content:space-between;gap:12px;
   padding:12px 0;border-bottom:1px solid var(--rule-soft);text-decoration:none;color:inherit}
@@ -613,6 +627,7 @@ details[open] summary{border-bottom:1px solid var(--rule-soft)}
   <div class="view" id="v-today"></div>
   <div class="view" id="v-plan" hidden></div>
   <div class="view" id="v-food" hidden></div>
+  <div class="view" id="v-cafe" hidden></div>
   <div class="view" id="v-money" hidden></div>
   <div class="view" id="v-info" hidden></div>
 </div>
@@ -623,7 +638,9 @@ details[open] summary{border-bottom:1px solid var(--rule-soft)}
   <button class="tab" role="tab" data-v="plan" aria-selected="false">
     <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>일정</button>
   <button class="tab" role="tab" data-v="food" aria-selected="false">
-    <svg viewBox="0 0 24 24"><path d="M6 3v8a2 2 0 0 0 4 0V3M8 11v10M15 3c-1.2 1.5-1.5 3-1.5 5s.5 3 1.8 3H18V3z"/><path d="M18 11v10"/></svg>음식</button>
+    <svg viewBox="0 0 24 24"><path d="M6 3v8a2 2 0 0 0 4 0V3M8 11v10M15 3c-1.2 1.5-1.5 3-1.5 5s.5 3 1.8 3H18V3z"/><path d="M18 11v10"/></svg>음식점</button>
+  <button class="tab" role="tab" data-v="cafe" aria-selected="false">
+    <svg viewBox="0 0 24 24"><path d="M4 8h13v6.5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM17 10h1.5a2.5 2.5 0 0 1 0 5H17M7 4.5c0 1 1 1 1 2M11 4.5c0 1 1 1 1 2"/></svg>카페</button>
   <button class="tab" role="tab" data-v="money" aria-selected="false">
     <svg viewBox="0 0 24 24"><path d="M7 5l5 7 5-7M12 12v7M8.5 13.5h7M8.5 16.5h7"/></svg>예산</button>
   <button class="tab" role="tab" data-v="info" aria-selected="false">
@@ -1411,6 +1428,72 @@ var SHOPS = [
   ["이시가키시 공설시장","大川208","8:00~19:00","이도터미널 도보권. 기념품은 2층 판매센터(10:00~19:00)","石垣市公設市場"]
 ];
 
+/* 장소 지도 좌표. 지도는 오프라인에서도 보이고, 핀을 누르면 정확한 상호명으로
+   구글지도를 다시 검색합니다. 섬 윤곽과 같은 투영식을 사용합니다. */
+var PLACE_GEO = {
+  "島そば一番地":[24.339,124.157], "石垣島きたうち牧場 浜崎本店":[24.340,124.150],
+  "八重山そば処 来夏世":[24.350,124.156], "うさぎや 石垣本店":[24.339,124.156],
+  "新垣食堂":[24.500,124.280], "海鮮居酒屋 鰓呼吸 美崎町店":[24.338,124.154],
+  "舟蔵の里":[24.354,124.137], "海人居酒屋 源 美崎店":[24.338,124.155],
+  "石垣牛 まる":[24.343,124.157], "キミ食堂":[24.337,124.166],
+  "明石食堂":[24.528,124.282],
+  "トラベラーズカフェ朔 石垣島":[24.340,124.158], "Rehellow beach 石垣島":[24.337,124.190],
+  "プカプカ 石垣島 真栄里":[24.342,124.193], "HaaYa nagomi cafe 竹富島":[24.331,124.086],
+  "ぱーらー願寿屋 竹富島":[24.329,124.087], "UliUli Cafe 石垣島":[24.477,124.273],
+  "ISHIGAKI MARKET 石垣市伊原間":[24.490,124.272], "R's Cafe 川平":[24.461,124.143],
+  "ALOALO CAFE 石垣島":[24.455,124.180], "カリブカフェ 川平":[24.458,124.145]
+};
+
+function placeMapHTML(title, items, tone){
+  var uniq = [], seen = {};
+  items.forEach(function(p){
+    if (!p[1] || seen[p[1]] || !PLACE_GEO[p[1]]) return;
+    seen[p[1]] = 1; uniq.push(p);
+  });
+  var fill = tone === "cafe" ? "var(--ok)" : "var(--chart)";
+  var id = tone === "cafe" ? "cafeSea" : "foodSea";
+  var s = '<svg viewBox="-16 -14 288 344" class="map" role="img" aria-label="' + esc(title) + '">' +
+    '<defs><pattern id="' + id + '" width="26" height="16" patternUnits="userSpaceOnUse">' +
+    '<path d="M0 8q6.5-5 13 0t13 0" fill="none" stroke="var(--lagoon)" stroke-width="1" opacity=".22"/></pattern></defs>' +
+    '<rect x="-16" y="-14" width="288" height="344" fill="var(--sea)"/>' +
+    '<rect x="-16" y="-14" width="288" height="344" fill="url(#' + id + ')"/>' +
+    '<path d="M' + COAST.map(function(p){ return PX(p[1]).toFixed(1) + ' ' + PY(p[0]).toFixed(1); }).join('L') +
+    'Z" fill="var(--isle)" stroke="var(--kawara)" stroke-width="1.6" stroke-linejoin="round"/>';
+  ISLES.forEach(function(o){
+    s += '<circle cx="' + PX(o[1]).toFixed(1) + '" cy="' + PY(o[0]).toFixed(1) + '" r="' +
+      (o[2] * 1000).toFixed(1) + '" fill="var(--isle)" stroke="var(--kawara)" stroke-width="1.4"/>';
+  });
+  var placed = [];
+  uniq.forEach(function(p,n){
+    var ll = PLACE_GEO[p[1]], x = PX(ll[1]), y = PY(ll[0]), bx=x, by=y, tries=0;
+    while (placed.some(function(v){ return Math.hypot(x-v[0],y-v[1]) < 18; }) && tries < 12) {
+      var angle=(n+tries)*2.4, radius=11+tries*3; x=bx+Math.cos(angle)*radius; y=by+Math.sin(angle)*radius; tries++;
+    }
+    placed.push([x,y]);
+    if (tries) s += '<line x1="' + bx.toFixed(1) + '" y1="' + by.toFixed(1) + '" x2="' + x.toFixed(1) +
+      '" y2="' + y.toFixed(1) + '" stroke="' + fill + '" stroke-width="1" opacity=".55"/>';
+    s += '<a class="place-pin" href="' + gmap(p[1]) + '" target="_blank" rel="noopener" aria-label="' +
+      esc(p[0]) + ' 구글지도로 열기"><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) +
+      '" r="8" fill="' + fill + '" stroke="var(--card)" stroke-width="2"/><text x="' + x.toFixed(1) +
+      '" y="' + (y+3).toFixed(1) + '" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">' +
+      (n+1) + '</text></a>';
+  });
+  s += '<g transform="translate(252,10)"><path d="M0 16V0M0 0l-4 5M0 0l4 5" stroke="var(--ink-3)" ' +
+    'stroke-width="1.3" fill="none"/><text x="0" y="26" text-anchor="middle" font-size="8" fill="var(--ink-3)">N</text></g></svg>';
+  var key = uniq.map(function(p,n){ return '<a href="' + gmap(p[1]) + '" target="_blank" rel="noopener"><b style="background:' +
+    fill + '">' + (n+1) + '</b><span>' + esc(p[0]) + '</span></a>'; }).join('');
+  return '<div class="card place-map"><div class="card-h"><h3>' + esc(title) + '</h3><span class="stamp">핀을 눌러 열기</span></div>' +
+    s + '<div class="place-key">' + key + '</div></div>';
+}
+
+function restaurantMapItems(){
+  return GROUP_REST.map(function(r){ return [r[0],r[4]]; }).concat(LUNCH.map(function(r){ return [r[0],r[3]]; }));
+}
+
+function cafeMapItems(){
+  var out=[]; CAFE_DAYS.forEach(function(D){ D.rows.forEach(function(c){ out.push([c[0],c[4]]); }); }); return out;
+}
+
 function foodRow(label, name, memo, q, tel){
   var h = '<div class="frow"><span class="fm">' + esc(label) + '</span><div class="fb">';
   h += q ? '<a class="geo" href="' + gmap(q) + '" target="_blank" rel="noopener">' + esc(name) +
@@ -1424,7 +1507,9 @@ function foodRow(label, name, memo, q, tel){
 
 function renderFood(){
   var h = '<div class="vhead"><h2>음식점</h2>' +
-    '<p>14명이 한 번에 앉느냐가 전부입니다. 좌석 수를 확인한 곳만 올렸고, 이름을 누르면 구글지도가 열립니다.</p></div>';
+    '<p>14명이 한 번에 앉느냐가 전부입니다. 지도에서 위치를 비교하고, 핀이나 이름을 누르면 구글지도가 열립니다.</p></div>';
+
+  h += placeMapHTML('음식점 위치 개념도', restaurantMapItems(), 'food');
 
   h += '<div class="sec-label">날짜별</div>';
   MEALS_BY_DAY.forEach(function(D){
@@ -1447,20 +1532,6 @@ function renderFood(){
   h += '<p class="note"><b>石垣庵은 후보에서 빼세요</b> — 66석이지만 연회 착석이 10명까지라 14명이 안 들어갑니다. ' +
        '기타우치 목장 미사키점은 2024년 3월에 닫았습니다. 야마모토(炭火焼肉 やまもと)는 가장 유명하지만 작고 예약이 한참 전에 찹니다.</p>';
 
-  h += '<div class="sec-label">카페</div>';
-  CAFE_DAYS.forEach(function(D){
-    h += '<div class="card cafeday"><div class="cd-head"><b>' + D.d + '</b><span>' + D.wd + '</span>' +
-      '<em>' + esc(D.ctx) + '</em></div>';
-    D.rows.forEach(function(c){
-      h += '<a class="crow" href="' + gmap(c[4]) + '" target="_blank" rel="noopener">' +
-        '<span class="cr-main"><b>' + esc(c[0]) + '</b>' +
-        '<i class="dot' + (c[6] ? ' on' : '') + '" title="' + (c[6] ? '그날 영업 확인' : '휴무 확인 필요') + '"></i>' +
-        '<span class="cr-meta">' + esc(c[1]) + '  ·  ' + esc(c[2]) + '</span>' +
-        '<small>' + esc(c[3]) + '</small></span><span class="arw">↗</span></a>';
-    });
-    h += '</div>';
-  });
-  h += '<p class="note"><b>초록 점이 그날 영업을 확인한 곳입니다.</b> 회색은 휴무일을 못 찾은 곳이라 가기 전에 한 번 보세요 — 이시가키는 화·수 휴무가 흔합니다. 이름을 누르면 구글지도가 열립니다.</p>';
   h += '<div class="sec-label">점심 — 예약 없이</div><div class="card">';
   LUNCH.forEach(function(r){ h += foodRow(r[1], r[0], r[2], r[3], r[4]); });
   h += '</div>';
@@ -1480,6 +1551,26 @@ function renderFood(){
        '자리를 못 잡는 날은 고기를 더 사서 한 번 더 하는 쪽이 14명이 갈라져 앉는 것보다 낫습니다.</p>';
 
   $("v-food").innerHTML = h;
+}
+
+function renderCafe(){
+  var h = '<div class="vhead"><h2>카페</h2><p>여행 날짜와 동선에 맞는 카페만 모았습니다. 지도 핀이나 이름을 누르면 구글지도가 열립니다.</p></div>';
+  h += placeMapHTML('카페 위치 개념도', cafeMapItems(), 'cafe');
+  h += '<div class="sec-label">날짜별 추천</div>';
+  CAFE_DAYS.forEach(function(D){
+    h += '<div class="card cafeday"><div class="cd-head"><b>' + D.d + '</b><span>' + D.wd + '</span>' +
+      '<em>' + esc(D.ctx) + '</em></div>';
+    D.rows.forEach(function(c){
+      h += '<a class="crow" href="' + gmap(c[4]) + '" target="_blank" rel="noopener">' +
+        '<span class="cr-main"><b>' + esc(c[0]) + '</b>' +
+        '<i class="dot' + (c[6] ? ' on' : '') + '" title="' + (c[6] ? '그날 영업 확인' : '휴무 확인 필요') + '"></i>' +
+        '<span class="cr-meta">' + esc(c[1]) + '  ·  ' + esc(c[2]) + '</span>' +
+        '<small>' + esc(c[3]) + '</small></span><span class="arw">↗</span></a>';
+    });
+    h += '</div>';
+  });
+  h += '<p class="note"><b>초록 점이 그날 영업을 확인한 곳입니다.</b> 회색은 휴무일을 못 찾은 곳이라 가기 전에 한 번 확인하세요. 이시가키는 화·수 휴무가 흔합니다.</p>';
+  $("v-cafe").innerHTML = h;
 }
 
 /* ─── 조 편성 ───
@@ -1621,8 +1712,8 @@ function renderInfo(){
 }
 
 /* ─── 탭 ─── */
-var VIEWS = ["today","plan","food","money","info"];
-var RENDER = { today:renderToday, plan:renderPlan, food:renderFood, money:renderMoney, info:renderInfo };
+var VIEWS = ["today","plan","food","cafe","money","info"];
+var RENDER = { today:renderToday, plan:renderPlan, food:renderFood, cafe:renderCafe, money:renderMoney, info:renderInfo };
 var current = "today";
 
 function show(name){
@@ -1638,7 +1729,10 @@ function show(name){
 
 $("tabbar").addEventListener("click", function(e){
   var b = e.target.closest(".tab");
-  if (b) show(b.getAttribute("data-v"));
+  if (!b) return;
+  var next = b.getAttribute("data-v");
+  if (window.history && history.replaceState) history.replaceState(null, "", "#" + next);
+  show(next);
 });
 
 /* ─── 화면 안 상호작용 ─── */
@@ -1714,7 +1808,8 @@ window.addEventListener("appinstalled", function(){
 if (tripIdx >= 0) { pickedDay = tripIdx; $("chip").textContent = "DAY " + (tripIdx+1); $("chip").className = "chip live"; }
 else if (afterTrip) { $("chip").textContent = "종료"; $("chip").className = "chip live"; }
 else { $("chip").textContent = "D-" + daysLeft; }
-show("today");
+var initialView = location.hash.replace(/^#/, "");
+show(VIEWS.indexOf(initialView) >= 0 ? initialView : "today");
 fetchWx(false);
 
 /* 앱으로 돌아올 때 한 번씩 다시 확인합니다 */
