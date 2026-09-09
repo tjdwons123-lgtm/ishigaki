@@ -1619,91 +1619,14 @@ function renderCafe(){
   $("v-cafe").innerHTML = h;
 }
 
-/* ─── 조 편성 ───
-   원칙: 기본은 14명이 함께 움직이고, 정해둔 몇 지점에서만 갈라집니다.
-   그래서 조를 두 종류로 나눕니다 — 늘 쓰는 '차 조'와, 그때만 만드는 '갈래'. */
-var TEAM_ROLES = [
-  ["총괄","<b>여행 전체에 한 명.</b> 갈라질 때 집합 시각과 장소를 선언하고, 예약 시각을 관리합니다. 결정이 필요할 때 이 사람이 정합니다.","1명"],
-  ["차장","차 한 대의 인원과 짐을 책임집니다. 출발 전 <b>내 차 7명</b>만 세면 됩니다. 페리 QR도 차장이 하나씩 듭니다.","차당 1명"],
-  ["운전","차당 <b>2명</b>이 국제운전면허증을 갖고 교대합니다. 9/16 북부 드라이브는 왕복 4시간이 넘습니다.","차당 2명"],
-  ["총무","큰 지출을 대표로 결제하고 기록합니다. <b>한 명만</b> — 여러 명이 적으면 같은 지출이 중복으로 잡힙니다.","1명"]
-];
-var SOBER = [
-  ["9/13","숙소 회식","불필요","마트에서 사와 숙소에서 먹으니 차를 안 씁니다"],
-  ["9/14","焼肉太陽 18:30","<b>2명</b>","시내 왕복 · 차당 1명"],
-  ["9/15","우사기야 19시 라이브","<b>2명</b>","전날과 <b>다른</b> 2명으로. 그래야 각자 하루만 금주합니다"],
-  ["9/16","시내에서 가볍게","마시면 2명","안 마시면 필요 없습니다. 다음 날 09:00 체크아웃이라 가볍게 가는 편이 낫습니다"],
-  ["9/17","—","불필요","오전에 공항으로 갑니다"]
-];
-/* 갈라지는 지점 — [날짜, 시간, 무엇, 갈래, 다시 모이는 곳] */
-var SPLITS = [
-  ["9/15","15:20~18:40","다케토미 복귀 후","유글레나몰 쇼핑(도보) · 야이마무라 원숭이 · 숙소 휴식","19:00 우사기야"],
-  ["9/16","14:05~16:30","가비라만","글라스보트 타는 사람 · 카페에서 쉴 사람","주차장에서 숙소로 함께"],
-  ["9/16","18:30","마지막 저녁","시내에서 먹을 사람 · 숙소에서 남은 걸 털 사람","숙소"]
-];
-
-function teamsHTML(){
-  var h = '<p class="tlede"><b>기본은 14명이 함께 움직입니다.</b> 갈라지는 건 아래 표에 적힌 몇 지점뿐이고, ' +
-    '그때만 그 자리에서 갈래를 만듭니다. 조를 미리 고정해두면 하루 종일 따로 노는 여행이 됩니다.</p>';
-
-  h += '<div class="sub-label">늘 쓰는 것 — 차 조</div>' +
-    '<p class="tlede">8인승 2대라 <b>이동할 때만</b> 7명씩 나뉩니다. 목적지에 도착하면 다시 한 덩어리입니다. ' +
-    '7명이면 <b>한 자리가 남아</b> 젖은 짐과 아이스박스를 둘 수 있습니다.</p>';
-  h += '<div class="teams">';
-  ["1","2"].forEach(function(t){
-    h += '<div class="team"><div class="tname">' + t + '호차 <span>7명</span></div>' +
-      '<ul><li>차장 1</li><li>운전 2 <small>(IDP 필수)</small></li><li>나머지 4</li></ul>' +
-      '<div class="tcar">여유 1석 · 짐 자리</div></div>';
-  });
-  h += '</div>';
-  h += '<p class="tlede">차 조는 <b>첫날 체크인 때 한 번 정하고 끝까지 씁니다.</b> 페리 예약(한 건에 10명 제한), ' +
-    '다케토미 물소 수레 2대, 글라스보트 2척이 전부 이 단위로 맞아떨어집니다.</p>';
-
-  h += '<div class="sub-label">갈라지는 지점</div><div class="tscroll"><table>' +
-    '<thead><tr><th>언제</th><th>무엇</th><th>갈래</th><th>다시 모이는 곳</th></tr></thead><tbody>';
-  SPLITS.forEach(function(s){
-    h += '<tr><td class="mono">' + s[0] + '<br><small>' + s[1] + '</small></td><td>' + s[2] +
-         '</td><td><small>' + s[3] + '</small></td><td><small>' + s[4] + '</small></td></tr>';
-  });
-  h += '</tbody></table></div>';
-
-  h += '<div class="sub-label">갈라질 때 지킬 것</div><ol class="rules">' +
-    '<li><b>차 1대가 최소 단위입니다.</b> 3명만 따로 가면 차가 모자랍니다. 갈래는 최대 두 갈래, 각 갈래에 차 1대.</li>' +
-    '<li><b>각 갈래에 운전자 1명 이상.</b> IDP 4명이 필요한 두 번째 이유입니다.</li>' +
-    '<li><b>갈라지기 전에 집합 시각과 장소를 말로 못 박습니다.</b> "이따 봐"로 헤어지면 한 시간이 날아갑니다.</li>' +
-    '<li><b>송영이 되는 투어는 차를 안 씁니다.</b> 9/14 투어가 숙소 픽업을 해주면 그날 차 2대는 안 씁니다 — 시라호가 픽업 범위인지 확인하세요.</li>' +
-    '</ol>';
-
-  h += '<div class="sub-label">역할</div><div class="roles">';
-  TEAM_ROLES.forEach(function(r){
-    h += '<div class="role"><div class="rname">' + r[0] + '<span>' + r[2] + '</span></div><p>' + r[1] + '</p></div>';
-  });
-  h += '</div>';
-
-  h += '<div class="sub-label">금주 당번</div>' +
-    '<p class="tlede">일본은 음주운전 시 <b>동승자와 차를 내준 사람까지</b> 처벌합니다. 예외가 없습니다.</p>' +
-    '<div class="tscroll"><table><thead><tr><th>날짜</th><th>저녁</th><th>금주</th><th>메모</th></tr></thead><tbody>';
-  SOBER.forEach(function(s){
-    h += '<tr><td class="mono">' + s[0] + '</td><td>' + s[1] + '</td><td>' + s[2] + '</td><td><small>' + s[3] + '</small></td></tr>';
-  });
-  h += '</tbody></table></div>';
-
-  h += '<p class="note"><b>술이 붙는 저녁이 9/14와 9/16 두 번뿐입니다.</b> IDP가 4명이면 각자 하루만 금주하면 됩니다. ' +
-    '2명뿐이면 그 둘이 두 번 다 금주해야 하고, 9/16 북부 드라이브에서 교대할 사람도 없습니다. 평일 경찰서 당일 발급입니다.</p>';
-  return h;
-}
-
 function renderInfo(){
 
   var h = '<div class="vhead"><h2>배경과 준비물</h2>' +
     '<p>왜 이 일정이 됐는지, 아직 답이 없는 건 무엇인지, 각자 뭘 챙겨야 하는지.</p></div>';
 
-  if (adopted["teams"]) {
-    h += '<details open><summary>A조 · B조 나누는 법</summary><div class="dbody">' + teamsHTML() + '</div></details>';
-  }
   var left = TASKS.filter(function(t){ return !(checks[t.id] && checks[t.id].done); }).length;
   var doneN = TASKS.length - left;
-  h += '<details' + (left ? ' open' : '') + '><summary>예약과 전화 · ' + doneN + '/' + TASKS.length + ' 완료</summary>' +
+  h += '<details><summary>예약과 전화 · ' + doneN + '/' + TASKS.length + ' 완료</summary>' +
     '<div class="dbody"><div class="prog"><div class="prog-l"><span>' + doneN + ' / ' + TASKS.length + '</span>' +
     '<span>' + Math.round(doneN / TASKS.length * 100) + '%</span></div>' +
     '<div class="prog-t"><div class="prog-f" style="width:' + (doneN / TASKS.length * 100) + '%"></div></div></div>';
@@ -1732,7 +1655,7 @@ function renderInfo(){
   });
   h += '</div></details>';
   var lastCat = "";
-  h += '<details open><summary>예약처 · 홈페이지 ' + LINKS.length + '곳</summary><div class="dbody">' +
+  h += '<details><summary>예약처 · 홈페이지 ' + LINKS.length + '곳</summary><div class="dbody">' +
     '<p class="tlede">2026-09-07에 전부 접속을 확인했습니다. 누르면 새 창으로 열립니다.</p>';
   LINKS.forEach(function(L){
     if (L[0] !== lastCat) { h += '<div class="sub-label">' + esc(L[0]) + '</div>'; lastCat = L[0]; }
