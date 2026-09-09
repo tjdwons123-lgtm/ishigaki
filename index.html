@@ -998,6 +998,7 @@ var LINKS = [
   ["배편", "안에이관광 — 운항상황", "https://aneikankou.co.jp/condition", "매일 아침 확인"],
   ["배편", "야에야마관광페리", "https://www.yaeyama.co.jp/josen.html", "안에이가 만석일 때 대안"],
   ["식당", "焼肉太陽", "https://maps.app.goo.gl/is7i8tq2gvTkh4ee8", "9/14 18:30 · 14명 예약 확정"],
+  ["식당", "石垣島麺処 美崎町店", "https://www.google.com/maps/place/石垣島麺処+美崎町店/@24.3390697,124.1540261,17z/data=!4m6!3m5!1s0x34600bc6003ed963:0xbd668fa37cefd23e!8m2!3d24.3390697!4d124.1566064!16s%2Fg%2F11vj99ds12", "심야 라멘 · 새벽 2시까지"],
   ["식당", "우사기야 이시가키 본점", "https://usagiya-ishigaki.com/", "9/16 21시 라이브 회차"],
   ["식당", "후나쿠라노사토", "https://funakuranosato.com/", "층 단위 전세 · 산신 공연"],
   ["식당", "이시가키규 마루", "https://ishigaki-maru.com/", "야키니쿠 대안 · 넷 예약"],
@@ -1423,6 +1424,10 @@ var LUNCH = [
   ["아카이시 식당","북부 이바루마 360","야에야마소바 명가지만 월·화·수 휴무 — 이번 일정과 안 맞습니다","明石食堂","0980-89-2447"]
 ];
 
+var LATE_EATS = [
+  ["石垣島麺処 美崎町店","미사키초 8-5","18:00~익일 02:00 · 심야 라멘","술자리 뒤 가볍게 마무리하기 좋은 시내 라멘집","石垣島麺処 美崎町店","0980-87-7441"]
+];
+
 var SHOPS = [
   ["맥스밸류 야이마점","真栄里292-1","24시간","공항과 시내 중간. 시라호에서 가장 실용적 — 9/13 벌크 장보기는 여기","マックスバリュやいま店"],
   ["A-프라이스 이시가키점","真栄里466-1","10:00~19:00","업무용 대용량. 14명 BBQ 식재료에 최적. 19시 마감 주의","A-プライス石垣店"],
@@ -1437,6 +1442,7 @@ var SHOPS = [
 var PLACE_GEO = {
   "島そば一番地":[24.339,124.157],
   "焼肉太陽 石垣市美崎町4-5":[24.337,124.154],
+  "石垣島麺処 美崎町店":[24.3390697,124.1566064],
   "八重山そば処 来夏世":[24.350,124.156], "うさぎや 石垣本店":[24.339,124.156],
   "新垣食堂":[24.500,124.280], "海鮮居酒屋 鰓呼吸 美崎町店":[24.338,124.154],
   "舟蔵の里":[24.354,124.137], "海人居酒屋 源 美崎店":[24.338,124.155],
@@ -1492,7 +1498,7 @@ function placeMapHTML(title, items, tone){
 }
 
 function restaurantMapItems(){
-  return GROUP_REST.map(function(r){ return [r[0],r[4]]; }).concat(LUNCH.map(function(r){ return [r[0],r[3]]; }));
+  return GROUP_REST.map(function(r){ return [r[0],r[4]]; }).concat(LUNCH.map(function(r){ return [r[0],r[3]]; }),LATE_EATS.map(function(r){ return [r[0],r[4]]; }));
 }
 
 function cafeMapItems(){
@@ -1549,6 +1555,9 @@ function renderFood(){
 
   h += '<details><summary>예약 없는 점심<span class="fold-count">' + LUNCH.length + '곳</span></summary><div class="dbody">';
   LUNCH.forEach(function(r){ h += foodRow(r[1],r[0],r[2],r[3],r[4]); }); h += '</div></details>';
+
+  h += '<details><summary>심야 식사<span class="fold-count">' + LATE_EATS.length + '곳</span></summary><div class="dbody">';
+  LATE_EATS.forEach(function(r){ h += foodRow(r[2],r[0],r[1]+' · '+r[3],r[4],r[5]); }); h += '</div></details>';
 
   h += '<details><summary>장보기<span class="fold-count">' + SHOPS.length + '곳</span></summary><div class="dbody">';
   SHOPS.forEach(function(r){ h += foodRow(r[2],r[0],r[1]+' · '+r[3],r[4],''); }); h += '</div></details>';
