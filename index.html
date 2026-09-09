@@ -454,6 +454,19 @@ tr.gapr td{border:0;font-weight:600;color:var(--chart)}
 .t-tag.alt{background:var(--rule-soft);color:var(--ink-3)}
 .t-tag.ok{background:var(--ok-soft);color:var(--ok)}
 
+.meat-card{padding:16px 18px}
+.meat-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.meat-head h3{font-size:15.5px;font-weight:700;line-height:1.35}
+.rank{flex:0 0 auto;font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;
+  color:var(--chart);background:var(--chart-soft);padding:4px 8px;border-radius:100px}
+.meat-fit{font-size:12.5px;color:var(--ink-2);margin-top:5px;line-height:1.5}
+.meat-metrics{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.meat-metrics span{font-family:"IBM Plex Mono",monospace;font-size:11px;padding:5px 8px;
+  border-radius:9px;background:var(--field);color:var(--ink-2)}
+.meat-metrics b{color:var(--ink);font-weight:600}
+.meat-card .calls{margin-top:10px}
+.meat-card .btn{padding:8px 13px;font-size:12.5px}
+
 /* 카페 — 날짜별 한 장, 안에 한 줄씩 */
 .cafeday{padding:0;overflow:hidden}
 .cd-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
@@ -1048,11 +1061,13 @@ function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} 
 
 /* ─── 상태 (저장은 이 기기 안에서만) ─── */
 var checks = load("isg-checks", {});
-var facts  = { yak:5500, fer:1880, car:0, fx:9.37, solo:15000, manta:9500 };
+var facts  = { yak:8000, fer:1880, car:0, fx:9.37, solo:15000, manta:9500 };
 var sf = load("isg-facts", null);
 if (sf) Object.keys(facts).forEach(function(k){
   if (typeof sf[k] === "number" && isFinite(sf[k])) facts[k] = sf[k];
 });
+/* 기타우치 기준의 옛 기본값은 새 후보 네 곳의 중간값으로 갱신합니다. */
+if (sf && sf.yak === 5500) { facts.yak = 8000; save("isg-facts", facts); }
 var me = ""; try { me = localStorage.getItem("isg-name") || ""; } catch(e){}
 var pickedDay = 0;
 
@@ -1381,6 +1396,14 @@ var GROUP_REST = [
   ["이시가키규 마루","야키니쿠","좌석 미공개","16:00~22:30 (L.O. 21:30) · 라인·넷 예약 · 14명 가능한지 물어봐야 합니다","石垣牛 まる","050-1722-5409",0,"https://ishigaki-maru.com/"]
 ];
 
+/* 9/14 고기집 긴급 후보. 맛 점수는 공개 리뷰와 메뉴 구성을 함께 본 추천 점수입니다. */
+var MEAT_914 = [
+  {rank:1,name:"石垣牛 비어가든 스카이",q:"石垣牛ビアガーデン スカイ",fit:"공식 온라인 예약 최대 16명 · 14명 조건에 정확히 맞음",hours:"17:00~23:00",price:"4,000~6,000엔",taste:"4.0",note:"가격과 단체 예약이 가장 간단합니다. 옥상이라 폭우·강풍 때 취소될 수 있습니다.",tel:"0980-87-0072",site:"https://beergarden-sky.com/",reserve:"https://tabelog.com/okinawa/A4705/A470501/47032410/"},
+  {rank:2,name:"YAKINIKU USHIGAKI",q:"YAKINIKU USHIGAKI 石垣島",fit:"8명 이상 단체 전화 접수 · 최대 40명",hours:"17:00~23:00 · 무휴",price:"8,500~13,000엔",taste:"4.3",note:"가격은 높지만 새 매장이고 메뉴 구성이 가장 좋습니다. 14명은 전화 예약이 원칙입니다.",tel:"080-9857-8609",site:"https://ushigaki.com/ishigaki/",reserve:"https://www.tablecheck.com/shops/yakiniku-ushigaki/reserve"},
+  {rank:3,name:"石垣牛焼肉 琉華",q:"石垣牛焼肉 ダイニング 琉華",fit:"144석 · 14명은 일반석 배치 문의",hours:"17:30~21:30 · 무휴",price:"6,000~10,000엔",taste:"4.1",note:"좌석 여유가 가장 큰 호텔 식당입니다. 개별 개인실은 최대 12명이라 일반석으로 요청해야 합니다.",tel:"0980-88-0030",site:"https://www.grandvrio-hotelresort.com/ishigaki/restaurant/ryuka/",reserve:"https://ryuka.foodre.jp/"},
+  {rank:4,name:"焼肉金城 이시가키 오카와점",q:"焼肉金城 石垣島大川店",fit:"60석 · 10~20명 개실 정보 있음",hours:"17:00~22:00 · 부정기 휴무",price:"6,000~10,000엔",taste:"4.4",note:"맛 우선 추천입니다. 14명 개실과 9/14 영업 여부를 전화로 같이 확인해야 합니다.",tel:"0980-87-9808",site:"https://yakiniku-kinjo.com/",reserve:"https://tabelog.com/okinawa/A4705/A470501/47022914/party/124942301/"}
+];
+
 /* 카페 — 날짜순. [이름, 위치, 시간·휴무, 메모, 검색어, 전화, 그날영업] */
 var CAFE_DAYS = [
   { d:"9/14", wd:"월", ctx:"투어 점심 휴식 11:30~13:30 · 항구에 내려 있습니다",
@@ -1441,6 +1464,8 @@ var PLACE_GEO = {
   "舟蔵の里":[24.354,124.137], "海人居酒屋 源 美崎店":[24.338,124.155],
   "石垣牛 まる":[24.343,124.157], "キミ食堂":[24.337,124.166],
   "明石食堂":[24.528,124.282],
+  "石垣牛ビアガーデン スカイ":[24.337,124.156], "YAKINIKU USHIGAKI 石垣島":[24.338,124.154],
+  "石垣牛焼肉 ダイニング 琉華":[24.351,124.132], "焼肉金城 石垣島大川店":[24.342,124.158],
   "トラベラーズカフェ朔 石垣島":[24.340,124.158], "Rehellow beach 石垣島":[24.337,124.190],
   "プカプカ 石垣島 真栄里":[24.342,124.193], "HaaYa nagomi cafe 竹富島":[24.331,124.086],
   "ぱーらー願寿屋 竹富島":[24.329,124.087], "UliUli Cafe 石垣島":[24.477,124.273],
@@ -1491,7 +1516,7 @@ function placeMapHTML(title, items, tone){
 }
 
 function restaurantMapItems(){
-  return GROUP_REST.map(function(r){ return [r[0],r[4]]; }).concat(LUNCH.map(function(r){ return [r[0],r[3]]; }));
+  return MEAT_914.map(function(r){ return [r.name,r.q]; }).concat(GROUP_REST.map(function(r){ return [r[0],r[4]]; }),LUNCH.map(function(r){ return [r[0],r[3]]; }));
 }
 
 function cafeMapItems(){
@@ -1527,11 +1552,23 @@ function groupRestHTML(r){
     '</div></div>';
 }
 
+function meatCandidateHTML(r){
+  return '<div class="card meat-card"><div class="meat-head"><h3>' + esc(r.name) + '</h3><span class="rank">' + r.rank + '순위</span></div>' +
+    '<p class="meat-fit">' + esc(r.fit) + '</p><div class="meat-metrics"><span><b>' + esc(r.price) + '</b> / 1인</span>' +
+    '<span>맛 <b>' + esc(r.taste) + '/5</b></span><span>' + esc(r.hours) + '</span></div>' +
+    '<p class="t-why">' + esc(r.note) + '</p><div class="calls"><a class="btn" href="' + r.reserve + '" target="_blank" rel="noopener">예약 확인</a>' +
+    '<a class="btn ghost" href="' + r.site + '" target="_blank" rel="noopener">홈페이지</a>' +
+    '<a class="btn ghost" href="tel:' + r.tel.replace(/-/g,'') + '">📞 ' + r.tel + '</a></div></div>';
+}
+
 function renderFood(){
-  var h = '<div class="vhead"><h2>식당</h2><p><b>기타우치 예약 실패</b> · 9/14 저녁 식당을 다시 정해야 합니다.</p></div>';
+  var h = '<div class="vhead"><h2>식당</h2><p><b>기타우치 예약 실패</b> · 9/14 저녁 고기집 후보를 다시 찾았습니다.</p></div>';
   var primary=GROUP_REST.filter(function(r){return r[6];}), alternatives=GROUP_REST.filter(function(r){return !r[6];});
 
-  h += '<div class="sec-label">남은 예약 후보</div>' + primary.map(groupRestHTML).join('');
+  h += '<div class="sec-label">9/14 고기집 대시보드</div>' + MEAT_914.map(meatCandidateHTML).join('') +
+    '<p class="note"><b>맛 점수는 제 추천 점수입니다.</b> 최신 공개 리뷰와 메뉴 구성을 기준으로 계산했습니다. 네 곳 모두 14명 수용 근거는 확인됐지만, 9/14 실제 빈자리는 예약 화면이나 전화로 확정해야 합니다.</p>';
+
+  h += '<div class="sec-label">다른 날 예약 후보</div>' + primary.map(groupRestHTML).join('');
   h += mapToggleHTML('전체 위치 지도', restaurantMapItems(), 'food');
 
   h += '<details><summary>날짜별 식사<span class="fold-count">5일</span></summary><div class="dbody inside-list">';
