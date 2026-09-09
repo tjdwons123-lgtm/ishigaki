@@ -499,6 +499,9 @@ tr.gapr td{border:0;font-weight:600;color:var(--chart)}
 .cstat{display:inline-block;margin-left:7px;padding:2px 7px;border-radius:100px;
   background:var(--rule-soft);color:var(--ink-3);font-size:10px;font-weight:500;vertical-align:1px}
 .cstat.on{background:var(--ok-soft);color:var(--ok)}
+.cafe-fold .dbody{padding:12px}
+.cafe-fold .cafeday{box-shadow:none;border:1px solid var(--rule-soft);margin-bottom:10px}
+.cafe-fold .cafeday:last-child{margin-bottom:0}
 
 /* ═══ 예약처 링크 ═══ */
 .link-row{display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -1424,6 +1427,15 @@ var LUNCH = [
   ["아카이시 식당","북부 이바루마 360","야에야마소바 명가지만 월·화·수 휴무 — 이번 일정과 안 맞습니다","明石食堂","0980-89-2447"]
 ];
 
+/* 식사보다 커피와 디저트가 중심인 카페 */
+var DESSERT_CAFES = [
+  ["KLATCH COFFEE","시내 · 공설시장 근처","매일 07:00~17:00","스페셜티 커피·라테·도넛. 실내 14석과 테라스 12석, 좌석 예약은 안 됩니다","KLATCH COFFEE 石垣島","커피"],
+  ["Hinata cafe ishigaki","시내 · 오카와 270-3","월·일 09:00~17:00 · 그 외 11:00~17:00","수제 시럽 빙수·크레페·커피 전문. 27석이지만 예약은 안 됩니다","Hinata cafe ishigaki","빙수"],
+  ["Doug's Coffee","아트호텔 이시가키 1층","08:00~18:00 · 케이크 10:00부터","핸드드립 커피와 호텔 파티시에 케이크. 깔끔하고 조용한 편","ダグズコーヒー アートホテル石垣島","커피·케이크"],
+  ["Hau Tree Gelato","시내 · 공설시장 도보 1분","9월 11:00~19:00 · 부정기 휴무","망고·홍이모·열대과일 젤라토 전문. 작은 카운터와 포장 중심","ハウトゥリージェラート 石垣島","젤라토"],
+  ["이시가키 푸딩 본점","미사키초 · 이도터미널 근처","11:00~20:00","섬 우유와 소금·홍이모 푸딩. 앉아서 쉬기보다는 포장 디저트에 가깝습니다","石垣島プリン本舗","푸딩"]
+];
+
 var LATE_EATS = [
   ["石垣島麺処 美崎町店","미사키초 8-5","18:00~익일 02:00 · 심야 라멘","술자리 뒤 가볍게 마무리하기 좋은 시내 라멘집","石垣島麺処 美崎町店","0980-87-7441"]
 ];
@@ -1443,6 +1455,11 @@ var PLACE_GEO = {
   "島そば一番地":[24.339,124.157],
   "焼肉太陽 石垣市美崎町4-5":[24.337,124.154],
   "石垣島麺処 美崎町店":[24.3390697,124.1566064],
+  "KLATCH COFFEE 石垣島":[24.341,124.158],
+  "Hinata cafe ishigaki":[24.3415,124.159],
+  "ダグズコーヒー アートホテル石垣島":[24.346,124.164],
+  "ハウトゥリージェラート 石垣島":[24.341,124.1595],
+  "石垣島プリン本舗":[24.338,124.154],
   "八重山そば処 来夏世":[24.350,124.156], "うさぎや 石垣本店":[24.339,124.156],
   "新垣食堂":[24.500,124.280], "海鮮居酒屋 鰓呼吸 美崎町店":[24.338,124.154],
   "舟蔵の里":[24.354,124.137], "海人居酒屋 源 美崎店":[24.338,124.155],
@@ -1502,7 +1519,9 @@ function restaurantMapItems(){
 }
 
 function cafeMapItems(){
-  var out=[]; CAFE_DAYS.forEach(function(D){ D.rows.forEach(function(c){ out.push([c[0],c[4]]); }); }); return out;
+  var out=DESSERT_CAFES.map(function(c){ return [c[0],c[4]]; });
+  CAFE_DAYS.forEach(function(D){ D.rows.forEach(function(c){ out.push([c[0],c[4]]); }); });
+  return out;
 }
 
 function mapToggleHTML(label, items, tone){
@@ -1572,9 +1591,17 @@ function renderFood(){
 }
 
 function renderCafe(){
-  var h = '<div class="vhead"><h2>카페</h2><p>날짜와 동선에 맞는 곳만 모았습니다.</p></div>';
+  var h = '<div class="vhead"><h2>카페</h2><p>커피와 디저트 중심으로 다시 골랐습니다.</p></div>';
+  h += '<div class="sec-label">커피·디저트</div><div class="card cafeday">';
+  DESSERT_CAFES.forEach(function(c){
+    h += '<a class="crow" href="' + gmap(c[4]) + '" target="_blank" rel="noopener">' +
+      '<span class="cr-main"><b>' + esc(c[0]) + '</b><i class="cstat on">' + esc(c[5]) + '</i>' +
+      '<span class="cr-meta">' + esc(c[1]) + '  ·  ' + esc(c[2]) + '</span>' +
+      '<small>' + esc(c[3]) + '</small></span><span class="arw">↗</span></a>';
+  });
+  h += '</div><p class="note">14명이 함께 들어갈 때는 자리가 나뉠 수 있습니다. 이름을 누르면 구글지도가 열립니다.</p>';
   h += mapToggleHTML('전체 위치 지도', cafeMapItems(), 'cafe');
-  h += '<div class="sec-label">날짜별</div>';
+  h += '<details class="cafe-fold"><summary>동선별 기존 후보<span class="fold-count">3일</span></summary><div class="dbody">';
   CAFE_DAYS.forEach(function(D){
     h += '<div class="card cafeday"><div class="cd-head"><b>' + D.d + '</b><span>' + D.wd + '</span>' +
       '<em>' + esc(D.ctx) + '</em></div>';
@@ -1587,6 +1614,7 @@ function renderCafe(){
     });
     h += '</div>';
   });
+  h += '</div></details>';
   h += '<p class="note">영업시간은 바뀔 수 있으니 방문 전에 지도에서 한 번 더 확인하세요.</p>';
   $("v-cafe").innerHTML = h;
 }
