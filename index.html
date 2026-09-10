@@ -224,18 +224,6 @@ button{font:inherit;color:inherit}
 .mini-b small{display:block;color:var(--ink-3);font-size:12.5px;line-height:1.55;margin-top:2px}
 .mini.key .mini-t{color:var(--chart);font-weight:600}
 
-.jump{display:block;width:100%;text-align:left;background:var(--shoal-soft);
-  border:0;border-radius:var(--r);padding:14px 16px;cursor:pointer;margin-bottom:14px;
-  display:flex;align-items:center;justify-content:space-between;gap:12px}
-.jump:hover{background:var(--shoal)}
-a.jump{text-decoration:none;color:inherit}
-a.jump.review{background:var(--chart-soft);border:1px solid var(--chart)}
-a.jump.review:hover{background:var(--chart);color:#fff}
-a.jump.review:hover small,a.jump.review:hover .arw{color:#fff}
-.jump b{font-size:14.5px;font-weight:600;display:block}
-.jump small{color:var(--ink-2);font-size:12.5px}
-.jump .arw{font-family:"IBM Plex Mono",monospace;color:var(--chart);font-size:16px;flex:0 0 auto}
-
 /* ═══ 날씨 ═══ */
 .wx-days{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:var(--rule-soft);
   border-radius:var(--r-sm);overflow:hidden;border:1px solid var(--rule-soft)}
@@ -797,23 +785,11 @@ function fetchWx(force){
   }).catch(function(){});
 }
 
-/* ─── 검수에서 채택한 안 ───
-   review/ 페이지에서 고른 결과를 그대로 읽습니다. 같은 주소(origin) 안에 있어서
-   저장소를 공유합니다. 아무것도 안 골랐으면 기존 일정 그대로입니다. */
-var adopted = load("isg-adopted", {});
-
-/* 채택된 안을 일정에 얹습니다. 원본은 건드리지 않고 그때그때 복사본을 만듭니다. */
 function dayOf(i){
   var D = DAYS[i];
   var out = { d:D.d, wd:D.wd, title:D.title, note:D.note,
               steps:D.steps.slice(), meals:D.meals.slice(), q:STEP_Q[i].slice() };
 
-  /* 원숭이는 3일차 오후에 붙입니다 — 다케토미에서 14:50 복귀 후 시간이 뜹니다 */
-  if (i === 2 && adopted["monkey"]) {
-    out.steps.push(["15:30","이시가키 야이마무라 — 리스자루노모리 (희망자)",
-      "시내에서 15분 · 09:00~17:30 · 입촌료 1,080엔~. 다람쥐원숭이가 반방사 상태라 어깨나 손에 올라옵니다. 마을 체험은 15:00에 끝나니 원숭이만 보는 셈입니다. 관심 없는 사람은 숙소로 먼저 돌아가면 됩니다",0]);
-    out.q.push("石垣やいま村");
-  }
   return out;
 }
 
@@ -875,8 +851,6 @@ var PY = function(lat){ return (24.625 - lat) * 1000; };
 
 function mapHTML(i){
   var legs = ROUTES[i];
-  /* 채택한 안에 따라 그날 경로가 달라집니다 */
-  if (i === 2 && adopted["monkey"]) legs = legs.concat([["town","yaima","car"],["yaima","shiraho","car"]]);
 
   /* 방문 순서대로 중복 없이 */
   var order = [], seen = {};
@@ -1166,15 +1140,6 @@ function renderToday(){
   var pending = TASKS.filter(function(t){ return !(checks[t.id] && checks[t.id].done); });
   var h = installHTML();
 
-  /* 검수 페이지로 가는 길 — 아직 아무것도 안 골랐으면 눈에 띄게 */
-  var picked = Object.keys(adopted).filter(function(k){ return adopted[k]; }).length;
-  h += '<a class="jump review" href="review/"><span><b>검수 페이지' +
-       (picked ? ' — ' + picked + '건 채택됨' : ' — 3건 검토 대기') + '</b>' +
-       '<small>' + (picked
-         ? '고른 안이 아래 일정과 예산에 반영돼 있습니다'
-         : '원숭이 · 조 편성 — 채택해야 반영됩니다') +
-       '</small></span><span class="arw">→</span></a>';
-
   if (tripIdx >= 0) {
     var D = dayOf(tripIdx);
     h += '<div class="hero"><span class="lbl">Day ' + (tripIdx+1) + ' of 5 · ' + D.d + ' (' + D.wd + ')</span>' +
@@ -1240,7 +1205,6 @@ function renderMoney(){
   /* 공금 개념 없이, 1인이 얼마나 쓰는지만 봅니다.
      함께 내는 항목은 14로 나누고, 개인이 따로 쓰는 건 그대로 더합니다. */
   var items = FIXED.slice();
-  if (adopted["monkey"]) items.push(["야이마무라 입촌료", 15120, "1,080엔 × 14"]);
 
   var shared = 0; items.forEach(function(r){ shared += r[1]; });
   shared += facts.yak * PAX + facts.fer * PAX;

@@ -2,7 +2,7 @@
    현지에서 데이터가 없어도 열리게 합니다.
    내용을 고쳐서 다시 올릴 때는 아래 VERSION 숫자만 올리세요. */
 
-var VERSION = "v29";
+var VERSION = "v30";
 var SHELL = "isg-shell-" + VERSION;
 var RUNTIME = "isg-runtime-" + VERSION;
 
@@ -10,9 +10,7 @@ var PRECACHE = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./icon.svg",
-  "./review/",
-  "./review/index.html"
+  "./icon.svg"
 ];
 
 self.addEventListener("install", function(e){
@@ -40,8 +38,7 @@ self.addEventListener("fetch", function(e){
   var req = e.request;
   if (req.method !== "GET") return;
 
-  /* 페이지 이동: 네트워크를 먼저 보되, 안 되면 그 주소의 캐시를 띄웁니다.
-     메인과 검수 페이지가 서로 다른 주소라 반드시 요청별로 저장해야 합니다. */
+  /* 페이지 이동: 네트워크를 먼저 보되, 안 되면 그 주소의 캐시를 띄웁니다. */
   if (req.mode === "navigate") {
     e.respondWith(
       fetch(req).then(function(res){

@@ -19,8 +19,7 @@ npx --yes http-server . -a 127.0.0.1 -p 8080 -c-1
 ## 파일 구성
 
 - `index.html`: 메인 화면, 스타일, 여행 데이터 및 앱 로직
-- `review/index.html`: 일정 제안 검토 및 채택 화면
-- `sw.js`: 오프라인 캐시 (현재 버전 `v19`)
+- `sw.js`: 오프라인 캐시
 - `manifest.webmanifest`, `icon*`: PWA 설치 설정 및 아이콘
 
 ## 개발 참고
