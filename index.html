@@ -492,6 +492,43 @@ tr.gapr td{border:0;font-weight:600;color:var(--chart)}
 .cafe-fold .dbody{padding:12px}
 .cafe-fold .cafeday{box-shadow:none;border:1px solid var(--rule-soft);margin-bottom:10px}
 .cafe-fold .cafeday:last-child{margin-bottom:0}
+.place-tools{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-2px 0 18px}
+.place-tools small{font-size:11.5px;color:var(--ink-3)}
+.place-add{border:0;border-radius:100px;background:var(--ink);color:var(--deep);padding:9px 14px;
+  font-size:13px;font-weight:600;cursor:pointer}
+.place-add:hover{background:var(--chart)}
+.custom-row{align-items:center}
+.custom-row .geo{font-size:14.5px}
+.place-del{border:0;background:var(--rule-soft);color:var(--ink-3);border-radius:100px;
+  padding:6px 9px;font-size:11px;cursor:pointer;flex:0 0 auto}
+.place-del:hover{background:var(--chart-soft);color:var(--chart)}
+
+dialog.place-dialog{width:min(460px,calc(100% - 28px));max-height:calc(100dvh - 28px);padding:0;
+  border:0;border-radius:20px;background:var(--card);color:var(--ink);box-shadow:0 20px 70px rgba(37,75,81,.28)}
+dialog.place-dialog::backdrop{background:rgba(24,49,54,.48);backdrop-filter:blur(2px)}
+.pd-head{display:flex;align-items:center;justify-content:space-between;padding:17px 18px;
+  border-bottom:1px solid var(--rule-soft)}
+.pd-head b{font-size:17px}.pd-close{border:0;background:var(--rule-soft);border-radius:50%;width:32px;height:32px;
+  font-size:19px;color:var(--ink-2);cursor:pointer}
+.pd-body{padding:16px 18px 20px;overflow:auto;max-height:calc(100dvh - 95px)}
+.pd-help{font-size:12.5px;color:var(--ink-2);line-height:1.6;margin-bottom:12px}
+.pd-help a{color:var(--chart);font-weight:600}
+.pd-fields{display:flex;gap:8px}.pd-fields input{flex:1;min-width:0;border:2px solid var(--rule);
+  background:var(--field);border-radius:11px;padding:10px 12px;font:inherit;font-size:14px;color:var(--ink)}
+.pd-fields input:focus{outline:0;border-color:var(--chart)}
+.pd-go{border:0;border-radius:11px;padding:10px 13px;background:var(--chart);color:#fff;font-weight:600;cursor:pointer}
+.pd-status{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;
+  font-size:11.5px;color:var(--ok)}
+.pd-status button{border:0;background:none;color:var(--ink-3);text-decoration:underline;cursor:pointer;font-size:11.5px}
+.pd-results{margin-top:12px}.pd-empty{padding:18px 4px;text-align:center;color:var(--ink-3);font-size:12.5px}
+.pd-result{padding:13px 0;border-top:1px solid var(--rule-soft)}
+.pdr-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.pdr-top b{font-size:14px}.pdr-score{font-family:"IBM Plex Mono",monospace;color:var(--chart);font-size:11px;white-space:nowrap}
+.pd-result p{font-size:12px;color:var(--ink-3);margin:3px 0 8px;line-height:1.45}
+.pdr-add{border:1px solid var(--chart);background:var(--card);color:var(--chart);border-radius:100px;
+  padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer}
+.pdr-add:hover{background:var(--chart);color:#fff}
+.google-note{text-align:right;font-size:10px;color:var(--ink-3);margin-top:8px}.google-note a{color:inherit;font-weight:600}
 
 /* ═══ 예약처 링크 ═══ */
 .link-row{display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -648,6 +685,22 @@ details[open] summary{border-bottom:1px solid var(--rule-soft)}
   <button class="tab" role="tab" data-v="info" aria-selected="false">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.4"/></svg>정보</button>
 </nav>
+
+<dialog class="place-dialog" id="place-dialog">
+  <div class="pd-head"><b id="place-dialog-title">장소 검색</b><button class="pd-close" type="button" data-place-close aria-label="닫기">×</button></div>
+  <div class="pd-body">
+    <div id="place-key-setup">
+      <p class="pd-help">Google Cloud에서 <b>Maps JavaScript API</b>와 <b>Places API (New)</b>를 켠 API 키를 입력하세요. 키는 이 기기에만 저장됩니다. <a href="https://console.cloud.google.com/google/maps-apis/credentials" target="_blank" rel="noopener">API 키 만들기 ↗</a></p>
+      <div class="pd-fields"><input id="place-api-key" type="password" autocomplete="off" placeholder="Google Maps API 키"><button class="pd-go" id="place-key-save" type="button">저장</button></div>
+    </div>
+    <div id="place-search-box" hidden>
+      <div class="pd-status"><span>Google Places 연결됨</span><button id="place-key-reset" type="button">API 키 변경</button></div>
+      <form id="place-search-form"><div class="pd-fields"><input id="place-query" type="search" autocomplete="off" placeholder="상호명 또는 음식 종류"><button class="pd-go" type="submit">검색</button></div></form>
+      <div class="pd-results" id="place-results"><p class="pd-empty">이시가키섬 주변에서 검색합니다.</p></div>
+      <p class="google-note">장소 정보 제공: <a href="https://maps.google.com" target="_blank" rel="noopener">Google Maps</a></p>
+    </div>
+  </div>
+</dialog>
 
 <script>
 (function(){
@@ -1027,6 +1080,10 @@ function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} 
 
 /* ─── 상태 (저장은 이 기기 안에서만) ─── */
 var checks = load("isg-checks", {});
+var customPlaces = load("isg-custom-places", []);
+if (!Array.isArray(customPlaces)) customPlaces = [];
+var mapsKey = ""; try { mapsKey = localStorage.getItem("isg-maps-key") || ""; } catch(e){}
+var placeTarget = "cafe", placeSearchResults = [], googleLoadPromise = null, mapsLoadedKey = "";
 var facts  = { yak:5500, fer:1880, car:0, fx:9.37, solo:15000, manta:9500 };
 var sf = load("isg-facts", null);
 if (sf) Object.keys(facts).forEach(function(k){
@@ -1474,7 +1531,7 @@ function placeMapHTML(title, items, tone){
     placed.push([x,y]);
     if (tries) s += '<line x1="' + bx.toFixed(1) + '" y1="' + by.toFixed(1) + '" x2="' + x.toFixed(1) +
       '" y2="' + y.toFixed(1) + '" stroke="' + fill + '" stroke-width="1" opacity=".55"/>';
-    s += '<a class="place-pin" href="' + gmap(p[1]) + '" target="_blank" rel="noopener" aria-label="' +
+    s += '<a class="place-pin" href="' + (p[2] || gmap(p[1])) + '" target="_blank" rel="noopener" aria-label="' +
       esc(p[0]) + ' 구글지도로 열기"><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) +
       '" r="8" fill="' + fill + '" stroke="var(--card)" stroke-width="2"/><text x="' + x.toFixed(1) +
       '" y="' + (y+3).toFixed(1) + '" text-anchor="middle" font-size="8" font-weight="700" fill="#fff">' +
@@ -1482,18 +1539,19 @@ function placeMapHTML(title, items, tone){
   });
   s += '<g transform="translate(252,10)"><path d="M0 16V0M0 0l-4 5M0 0l4 5" stroke="var(--ink-3)" ' +
     'stroke-width="1.3" fill="none"/><text x="0" y="26" text-anchor="middle" font-size="8" fill="var(--ink-3)">N</text></g></svg>';
-  var key = uniq.map(function(p,n){ return '<a href="' + gmap(p[1]) + '" target="_blank" rel="noopener"><b style="background:' +
+  var key = uniq.map(function(p,n){ return '<a href="' + (p[2] || gmap(p[1])) + '" target="_blank" rel="noopener"><b style="background:' +
     fill + '">' + (n+1) + '</b><span>' + esc(p[0]) + '</span></a>'; }).join('');
   return '<div class="card place-map"><div class="card-h"><h3>' + esc(title) + '</h3><span class="stamp">핀을 눌러 열기</span></div>' +
     s + '<div class="place-key">' + key + '</div></div>';
 }
 
 function restaurantMapItems(){
-  return GROUP_REST.map(function(r){ return [r[0],r[4]]; }).concat(LUNCH.map(function(r){ return [r[0],r[3]]; }),LATE_EATS.map(function(r){ return [r[0],r[4]]; }));
+  return GROUP_REST.map(function(r){ return [r[0],r[4]]; })
+    .concat(LUNCH.map(function(r){ return [r[0],r[3]]; }),LATE_EATS.map(function(r){ return [r[0],r[4]]; }),customMapItems("food"));
 }
 
 function cafeMapItems(){
-  return DESSERT_CAFES.map(function(c){ return [c[0],c[4]]; });
+  return DESSERT_CAFES.map(function(c){ return [c[0],c[4]]; }).concat(customMapItems("cafe"));
 }
 
 function mapToggleHTML(label, items, tone){
@@ -1501,6 +1559,33 @@ function mapToggleHTML(label, items, tone){
   items.forEach(function(p){ if(p[1] && !mapSeen[p[1]]){ mapSeen[p[1]]=1; mapCount++; } });
   return '<details class="map-toggle"><summary>' + esc(label) + '<span>' + mapCount + '곳</span></summary>' +
     '<div class="dbody">' + placeMapHTML(label, items, tone) + '</div></details>';
+}
+
+function customMapItems(kind){
+  return customPlaces.filter(function(p){ return p.kind === kind; }).map(function(p){
+    var q = p.name + " " + p.address;
+    PLACE_GEO[q] = [p.lat,p.lng];
+    return [p.name,q,p.url || gmap(q)];
+  });
+}
+
+function placeToolsHTML(kind){
+  return '<div class="place-tools"><button class="place-add" type="button" data-place-open="' + kind + '">+ Google 지도에서 검색</button>' +
+    '<small>추가한 장소는 이 기기에 저장</small></div>';
+}
+
+function customPlacesHTML(kind){
+  var rows = customPlaces.filter(function(p){ return p.kind === kind; });
+  if (!rows.length) return "";
+  var h = '<div class="sec-label">직접 추가한 곳</div><div class="card cafeday">';
+  rows.forEach(function(p){
+    h += '<div class="crow custom-row"><span class="cr-main"><a class="geo" href="' + (p.url || gmap(p.name+" "+p.address)) +
+      '" target="_blank" rel="noopener">' + esc(p.name) + '</a>' +
+      (p.rating ? '<i class="cscore">★ ' + esc(p.rating) + ' · 리뷰 ' + Number(p.reviews || 0).toLocaleString("ko-KR") + '</i>' : '') +
+      '<span class="cr-meta">' + esc(p.address || "주소 정보 없음") + '</span><small>Google 검색으로 추가</small></span>' +
+      '<button class="place-del" type="button" data-place-delete="' + esc(p.id) + '">삭제</button></div>';
+  });
+  return h + '</div>';
 }
 
 function foodRow(label, name, memo, q, tel){
@@ -1530,6 +1615,7 @@ function renderFood(){
   var primary=GROUP_REST.filter(function(r){return r[6];}), alternatives=GROUP_REST.filter(function(r){return !r[6];});
 
   h += placeMapHTML('음식점 지도', restaurantMapItems(), 'food');
+  h += placeToolsHTML('food') + customPlacesHTML('food');
   h += '<div class="sec-label">예약 현황</div>' + primary.map(groupRestHTML).join('');
 
   h += '<details><summary>날짜별 식사<span class="fold-count">5일</span></summary><div class="dbody inside-list">';
@@ -1565,6 +1651,7 @@ function renderFood(){
 function renderCafe(){
   var h = '<div class="vhead"><h2>카페</h2></div>';
   h += placeMapHTML('평점 좋은 카페 지도', cafeMapItems(), 'cafe');
+  h += placeToolsHTML('cafe') + customPlacesHTML('cafe');
   h += '<div class="sec-label">평점·리뷰 추천</div><div class="card cafeday">';
   DESSERT_CAFES.forEach(function(c){
     h += '<a class="crow" href="' + gmap(c[4]) + '" target="_blank" rel="noopener">' +
@@ -1638,6 +1725,91 @@ function renderInfo(){
   $("v-info").innerHTML = h;
 }
 
+/* ─── Google Places 검색·직접 추가 ─── */
+function renderPlaceKeyState(){
+  $("place-key-setup").hidden = !!mapsKey;
+  $("place-search-box").hidden = !mapsKey;
+}
+
+function openPlaceDialog(kind){
+  placeTarget = kind;
+  placeSearchResults = [];
+  $("place-dialog-title").textContent = (kind === "food" ? "식당" : "카페") + " 검색·추가";
+  $("place-results").innerHTML = '<p class="pd-empty">이시가키섬 주변에서 검색합니다.</p>';
+  renderPlaceKeyState();
+  var dlg = $("place-dialog");
+  if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open","");
+  setTimeout(function(){ (mapsKey ? $("place-query") : $("place-api-key")).focus(); },50);
+}
+
+function loadGooglePlaces(){
+  if (window.google && google.maps && google.maps.importLibrary && mapsLoadedKey === mapsKey) return Promise.resolve();
+  if (googleLoadPromise) return googleLoadPromise;
+  mapsLoadedKey = mapsKey;
+  googleLoadPromise = new Promise(function(resolve,reject){
+    var cb = "__isgPlacesReady";
+    window[cb] = function(){ delete window[cb]; resolve(); };
+    var params = new URLSearchParams({key:mapsKey,v:"weekly",loading:"async",libraries:"places",language:"ko",region:"JP",callback:cb});
+    var script = document.createElement("script");
+    script.src = "https://maps.googleapis.com/maps/api/js?" + params.toString();
+    script.async = true;
+    script.onerror = function(){ googleLoadPromise=null; delete window[cb]; reject(new Error("Google Maps API를 불러오지 못했습니다.")); };
+    document.head.appendChild(script);
+  });
+  return googleLoadPromise;
+}
+
+function renderPlaceResults(){
+  if (!placeSearchResults.length) {
+    $("place-results").innerHTML = '<p class="pd-empty">검색 결과가 없습니다.</p>';
+    return;
+  }
+  $("place-results").innerHTML = placeSearchResults.map(function(p,i){
+    var score = p.rating ? '★ ' + p.rating.toFixed(1) + (p.userRatingCount ? ' · 리뷰 ' + p.userRatingCount.toLocaleString("ko-KR") : '') : '평점 없음';
+    return '<div class="pd-result"><div class="pdr-top"><b>' + esc(p.displayName || "이름 없음") + '</b><span class="pdr-score">' + score + '</span></div>' +
+      '<p>' + esc(p.formattedAddress || "주소 정보 없음") + '</p><button class="pdr-add" type="button" data-place-result="' + i + '">+ ' +
+      (placeTarget === "food" ? "식당" : "카페") + '에 추가</button></div>';
+  }).join("");
+}
+
+async function searchGooglePlaces(query){
+  var box = $("place-results");
+  box.innerHTML = '<p class="pd-empty">Google 지도에서 검색 중…</p>';
+  try {
+    await loadGooglePlaces();
+    var lib = await google.maps.importLibrary("places");
+    var result = await lib.Place.searchByText({
+      textQuery: query + " 石垣島 沖縄",
+      fields: ["id","displayName","formattedAddress","location","rating","userRatingCount","googleMapsURI","primaryTypeDisplayName"],
+      locationBias: {lat:24.40,lng:124.17},
+      language: "ko",
+      region: "jp",
+      maxResultCount: 8
+    });
+    placeSearchResults = result.places || [];
+    renderPlaceResults();
+  } catch(err) {
+    box.innerHTML = '<p class="pd-empty">검색하지 못했습니다. API 키 제한과 Places API (New) 활성화를 확인하세요.</p>';
+  }
+}
+
+function addPlaceResult(index){
+  var p = placeSearchResults[index];
+  if (!p || !p.location) return;
+  var lat = typeof p.location.lat === "function" ? p.location.lat() : p.location.lat;
+  var lng = typeof p.location.lng === "function" ? p.location.lng() : p.location.lng;
+  if (!isFinite(lat) || !isFinite(lng)) return;
+  var item = {id:p.id || (p.displayName+"-"+lat+"-"+lng),kind:placeTarget,name:p.displayName || "이름 없음",
+    address:p.formattedAddress || "",lat:lat,lng:lng,rating:p.rating || 0,reviews:p.userRatingCount || 0,
+    type:p.primaryTypeDisplayName || "",url:p.googleMapsURI || ""};
+  customPlaces = customPlaces.filter(function(x){ return x.id !== item.id; });
+  customPlaces.unshift(item);
+  save("isg-custom-places",customPlaces);
+  if ($("place-dialog").open) $("place-dialog").close();
+  RENDER[placeTarget]();
+  $("views").scrollTop = 0;
+}
+
 /* ─── 탭 ─── */
 var VIEWS = ["today","plan","food","cafe","money","info"];
 var RENDER = { today:renderToday, plan:renderPlan, food:renderFood, cafe:renderCafe, money:renderMoney, info:renderInfo };
@@ -1664,6 +1836,18 @@ $("tabbar").addEventListener("click", function(e){
 
 /* ─── 화면 안 상호작용 ─── */
 $("views").addEventListener("click", function(e){
+  var placeOpen = e.target.closest("[data-place-open]");
+  if (placeOpen) { openPlaceDialog(placeOpen.getAttribute("data-place-open")); return; }
+
+  var placeDelete = e.target.closest("[data-place-delete]");
+  if (placeDelete) {
+    var placeId = placeDelete.getAttribute("data-place-delete");
+    customPlaces = customPlaces.filter(function(p){ return p.id !== placeId; });
+    save("isg-custom-places",customPlaces);
+    RENDER[current]();
+    return;
+  }
+
   if (e.target.closest("[data-hide=install]")) {
     hidInstall = true;
     try { localStorage.setItem("isg-hide-install", "1"); } catch(err){}
@@ -1692,6 +1876,42 @@ $("views").addEventListener("click", function(e){
     save("isg-checks", checks);
     renderInfo();
   }
+});
+
+$("place-dialog").addEventListener("click", function(e){
+  if (e.target.closest("[data-place-close]")) { $("place-dialog").close(); return; }
+  var add = e.target.closest("[data-place-result]");
+  if (add) addPlaceResult(+add.getAttribute("data-place-result"));
+});
+
+$("place-key-save").addEventListener("click", function(){
+  var key = $("place-api-key").value.trim();
+  if (!key) { $("place-api-key").focus(); return; }
+  var reload = !!mapsLoadedKey && mapsLoadedKey !== key;
+  mapsKey = key;
+  try { localStorage.setItem("isg-maps-key",key); } catch(err){}
+  $("place-api-key").value = "";
+  if (reload) { location.reload(); return; }
+  renderPlaceKeyState();
+  $("place-query").focus();
+});
+
+$("place-key-reset").addEventListener("click", function(){
+  mapsKey = "";
+  try { localStorage.removeItem("isg-maps-key"); } catch(err){}
+  renderPlaceKeyState();
+  $("place-api-key").focus();
+});
+
+$("place-api-key").addEventListener("keydown", function(e){
+  if (e.key === "Enter") { e.preventDefault(); $("place-key-save").click(); }
+});
+
+$("place-search-form").addEventListener("submit", function(e){
+  e.preventDefault();
+  var q = $("place-query").value.trim();
+  if (!q) { $("place-query").focus(); return; }
+  searchGooglePlaces(q);
 });
 
 $("views").addEventListener("input", function(e){
